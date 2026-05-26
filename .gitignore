@@ -1,0 +1,21 @@
+# User requested ignores
+atlas_df.pdf
+trabalho_de_PCA.pdf
+Trabalho_de_PCA.pdf
+
+# Python virtual environment
+venv/
+.venv/
+env/
+.env/
+
+# Python cache and temporary files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
