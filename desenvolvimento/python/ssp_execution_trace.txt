@@ -1,0 +1,545 @@
+TRACE OF SSP ITERATIONS
+========================
+
+Iteration 1:
+  Source Node: ETA Sobradinho
+  Sink Node: Sobradinho
+  Path taken:
+    ETA Sobradinho -> Sobradinho (forward)
+  Path distance (reduced cost): 5.5600
+  Flow augmented (delta): 570.00 l/s
+  Node Excesses after update:
+    Ceilândia: -836.17 l/s
+    ETA Brasília: +1200.00 l/s
+    ETA Gama: +320.00 l/s
+    ETA Lago Norte: +700.00 l/s
+    ETA Paranoá: +300.00 l/s
+    ETA Planaltina: +60.00 l/s
+    ETA Rio Descoberto: +4450.00 l/s
+    ETA Sobradinho: +0.00 l/s
+    Guará: -1067.97 l/s
+    Planaltina: -927.23 l/s
+    Plano Piloto: -1763.40 l/s
+    Samambaia: -852.72 l/s
+    Sobradinho: -531.09 l/s
+    Taguatinga: -1051.42 l/s
+  Node Potentials after update:
+    Ceilândia: +13.3600
+    ETA Brasília: +0.0000
+    ETA Gama: +0.0000
+    ETA Lago Norte: +0.0000
+    ETA Paranoá: +0.0000
+    ETA Planaltina: +0.0000
+    ETA Rio Descoberto: +0.0000
+    ETA Sobradinho: +0.0000
+    Guará: +11.1000
+    Planaltina: +30.1400
+    Plano Piloto: +4.6900
+    Samambaia: +14.2500
+    Sobradinho: +2.7800
+    Taguatinga: +6.0800
+--------------------------------------------------
+Iteration 2:
+  Source Node: ETA Rio Descoberto
+  Sink Node: Ceilândia
+  Path taken:
+    ETA Rio Descoberto -> Ceilândia (forward)
+  Path distance (reduced cost): 0.0000
+  Flow augmented (delta): 836.17 l/s
+  Node Excesses after update:
+    Ceilândia: +0.00 l/s
+    ETA Brasília: +1200.00 l/s
+    ETA Gama: +320.00 l/s
+    ETA Lago Norte: +700.00 l/s
+    ETA Paranoá: +300.00 l/s
+    ETA Planaltina: +60.00 l/s
+    ETA Rio Descoberto: +3613.83 l/s
+    ETA Sobradinho: +0.00 l/s
+    Guará: -1067.97 l/s
+    Planaltina: -927.23 l/s
+    Plano Piloto: -1763.40 l/s
+    Samambaia: -852.72 l/s
+    Sobradinho: -531.09 l/s
+    Taguatinga: -1051.42 l/s
+  Node Potentials after update:
+    Ceilândia: -13.3600
+    ETA Brasília: +0.0000
+    ETA Gama: +0.0000
+    ETA Lago Norte: +0.0000
+    ETA Paranoá: +0.0000
+    ETA Planaltina: +0.0000
+    ETA Rio Descoberto: +0.0000
+    ETA Sobradinho: +0.0000
+    Guará: -11.1000
+    Planaltina: -30.1400
+    Plano Piloto: -4.6900
+    Samambaia: -14.2500
+    Sobradinho: -2.7800
+    Taguatinga: -6.0800
+--------------------------------------------------
+Iteration 3:
+  Source Node: ETA Brasília
+  Sink Node: Guará
+  Path taken:
+    ETA Brasília -> Guará (forward)
+  Path distance (reduced cost): 0.0000
+  Flow augmented (delta): 1067.97 l/s
+  Node Excesses after update:
+    Ceilândia: +0.00 l/s
+    ETA Brasília: +132.03 l/s
+    ETA Gama: +320.00 l/s
+    ETA Lago Norte: +700.00 l/s
+    ETA Paranoá: +300.00 l/s
+    ETA Planaltina: +60.00 l/s
+    ETA Rio Descoberto: +3613.83 l/s
+    ETA Sobradinho: +0.00 l/s
+    Guará: +0.00 l/s
+    Planaltina: -927.23 l/s
+    Plano Piloto: -1763.40 l/s
+    Samambaia: -852.72 l/s
+    Sobradinho: -531.09 l/s
+    Taguatinga: -1051.42 l/s
+  Node Potentials after update:
+    Ceilândia: -13.3600
+    ETA Brasília: +0.0000
+    ETA Gama: +0.0000
+    ETA Lago Norte: +0.0000
+    ETA Paranoá: +0.0000
+    ETA Planaltina: +0.0000
+    ETA Rio Descoberto: +0.0000
+    ETA Sobradinho: -1.5400
+    Guará: -11.1000
+    Planaltina: -30.1400
+    Plano Piloto: -4.6900
+    Samambaia: -14.2500
+    Sobradinho: -4.3200
+    Taguatinga: -6.0800
+--------------------------------------------------
+Iteration 4:
+  Source Node: ETA Planaltina
+  Sink Node: Planaltina
+  Path taken:
+    ETA Planaltina -> Planaltina (forward)
+  Path distance (reduced cost): 0.0000
+  Flow augmented (delta): 60.00 l/s
+  Node Excesses after update:
+    Ceilândia: +0.00 l/s
+    ETA Brasília: +132.03 l/s
+    ETA Gama: +320.00 l/s
+    ETA Lago Norte: +700.00 l/s
+    ETA Paranoá: +300.00 l/s
+    ETA Planaltina: +0.00 l/s
+    ETA Rio Descoberto: +3613.83 l/s
+    ETA Sobradinho: +0.00 l/s
+    Guará: +0.00 l/s
+    Planaltina: -867.23 l/s
+    Plano Piloto: -1763.40 l/s
+    Samambaia: -852.72 l/s
+    Sobradinho: -531.09 l/s
+    Taguatinga: -1051.42 l/s
+  Node Potentials after update:
+    Ceilândia: -13.3600
+    ETA Brasília: +0.0000
+    ETA Gama: +0.0000
+    ETA Lago Norte: +0.0000
+    ETA Paranoá: +0.0000
+    ETA Planaltina: +0.0000
+    ETA Rio Descoberto: +0.0000
+    ETA Sobradinho: -1.5400
+    Guará: -11.1000
+    Planaltina: -30.1400
+    Plano Piloto: -4.6900
+    Samambaia: -14.2500
+    Sobradinho: -4.3200
+    Taguatinga: -6.0800
+--------------------------------------------------
+Iteration 5:
+  Source Node: ETA Brasília
+  Sink Node: Plano Piloto
+  Path taken:
+    ETA Brasília -> Plano Piloto (forward)
+  Path distance (reduced cost): 0.0000
+  Flow augmented (delta): 132.03 l/s
+  Node Excesses after update:
+    Ceilândia: +0.00 l/s
+    ETA Brasília: +0.00 l/s
+    ETA Gama: +320.00 l/s
+    ETA Lago Norte: +700.00 l/s
+    ETA Paranoá: +300.00 l/s
+    ETA Planaltina: +0.00 l/s
+    ETA Rio Descoberto: +3613.83 l/s
+    ETA Sobradinho: +0.00 l/s
+    Guará: +0.00 l/s
+    Planaltina: -867.23 l/s
+    Plano Piloto: -1631.37 l/s
+    Samambaia: -852.72 l/s
+    Sobradinho: -531.09 l/s
+    Taguatinga: -1051.42 l/s
+  Node Potentials after update:
+    Ceilândia: -13.3600
+    ETA Brasília: +0.0000
+    ETA Gama: +0.0000
+    ETA Lago Norte: +0.0000
+    ETA Paranoá: +0.0000
+    ETA Planaltina: +0.0000
+    ETA Rio Descoberto: +0.0000
+    ETA Sobradinho: -1.5400
+    Guará: -11.1000
+    Planaltina: -30.1400
+    Plano Piloto: -4.6900
+    Samambaia: -14.2500
+    Sobradinho: -4.3200
+    Taguatinga: -6.0800
+--------------------------------------------------
+Iteration 6:
+  Source Node: ETA Lago Norte
+  Sink Node: Planaltina
+  Path taken:
+    ETA Lago Norte -> Planaltina (forward)
+  Path distance (reduced cost): 0.0000
+  Flow augmented (delta): 700.00 l/s
+  Node Excesses after update:
+    Ceilândia: +0.00 l/s
+    ETA Brasília: +0.00 l/s
+    ETA Gama: +320.00 l/s
+    ETA Lago Norte: +0.00 l/s
+    ETA Paranoá: +300.00 l/s
+    ETA Planaltina: +0.00 l/s
+    ETA Rio Descoberto: +3613.83 l/s
+    ETA Sobradinho: +0.00 l/s
+    Guará: +0.00 l/s
+    Planaltina: -167.23 l/s
+    Plano Piloto: -1631.37 l/s
+    Samambaia: -852.72 l/s
+    Sobradinho: -531.09 l/s
+    Taguatinga: -1051.42 l/s
+  Node Potentials after update:
+    Ceilândia: -13.3600
+    ETA Brasília: +0.0000
+    ETA Gama: +0.0000
+    ETA Lago Norte: +0.0000
+    ETA Paranoá: +0.0000
+    ETA Planaltina: -12.6900
+    ETA Rio Descoberto: +0.0000
+    ETA Sobradinho: -12.3700
+    Guará: -11.1000
+    Planaltina: -42.8300
+    Plano Piloto: -4.6900
+    Samambaia: -14.2500
+    Sobradinho: -15.1500
+    Taguatinga: -6.0800
+--------------------------------------------------
+Iteration 7:
+  Source Node: ETA Rio Descoberto
+  Sink Node: Samambaia
+  Path taken:
+    ETA Rio Descoberto -> Samambaia (forward)
+  Path distance (reduced cost): 0.0000
+  Flow augmented (delta): 852.72 l/s
+  Node Excesses after update:
+    Ceilândia: +0.00 l/s
+    ETA Brasília: +0.00 l/s
+    ETA Gama: +320.00 l/s
+    ETA Lago Norte: +0.00 l/s
+    ETA Paranoá: +300.00 l/s
+    ETA Planaltina: +0.00 l/s
+    ETA Rio Descoberto: +2761.11 l/s
+    ETA Sobradinho: +0.00 l/s
+    Guará: +0.00 l/s
+    Planaltina: -167.23 l/s
+    Plano Piloto: -1631.37 l/s
+    Samambaia: +0.00 l/s
+    Sobradinho: -531.09 l/s
+    Taguatinga: -1051.42 l/s
+  Node Potentials after update:
+    Ceilândia: -13.3600
+    ETA Brasília: -0.5800
+    ETA Gama: +0.0000
+    ETA Lago Norte: +0.0000
+    ETA Paranoá: +0.0000
+    ETA Planaltina: -12.6900
+    ETA Rio Descoberto: +0.0000
+    ETA Sobradinho: -12.3700
+    Guará: -11.6800
+    Planaltina: -42.8300
+    Plano Piloto: -5.2700
+    Samambaia: -14.2500
+    Sobradinho: -15.1500
+    Taguatinga: -6.0800
+--------------------------------------------------
+Iteration 8:
+  Source Node: ETA Paranoá
+  Sink Node: Planaltina
+  Path taken:
+    ETA Paranoá -> Sobradinho (forward)
+    Sobradinho -> ETA Sobradinho (backward)
+    ETA Sobradinho -> Planaltina (forward)
+  Path distance (reduced cost): 0.0000
+  Flow augmented (delta): 167.23 l/s
+  Node Excesses after update:
+    Ceilândia: +0.00 l/s
+    ETA Brasília: +0.00 l/s
+    ETA Gama: +320.00 l/s
+    ETA Lago Norte: +0.00 l/s
+    ETA Paranoá: +132.77 l/s
+    ETA Planaltina: +0.00 l/s
+    ETA Rio Descoberto: +2761.11 l/s
+    ETA Sobradinho: +0.00 l/s
+    Guará: +0.00 l/s
+    Planaltina: +0.00 l/s
+    Plano Piloto: -1631.37 l/s
+    Samambaia: +0.00 l/s
+    Sobradinho: -531.09 l/s
+    Taguatinga: -1051.42 l/s
+  Node Potentials after update:
+    Ceilândia: -13.3600
+    ETA Brasília: -3.3900
+    ETA Gama: +0.0000
+    ETA Lago Norte: -7.1100
+    ETA Paranoá: +0.0000
+    ETA Planaltina: -19.8000
+    ETA Rio Descoberto: +0.0000
+    ETA Sobradinho: -14.1900
+    Guará: -14.4900
+    Planaltina: -49.9400
+    Plano Piloto: -8.0800
+    Samambaia: -14.2500
+    Sobradinho: -16.9700
+    Taguatinga: -6.0800
+--------------------------------------------------
+Iteration 9:
+  Source Node: ETA Rio Descoberto
+  Sink Node: Plano Piloto
+  Path taken:
+    ETA Rio Descoberto -> Guará (forward)
+    Guará -> ETA Brasília (backward)
+    ETA Brasília -> Plano Piloto (forward)
+  Path distance (reduced cost): 0.0000
+  Flow augmented (delta): 1067.97 l/s
+  Node Excesses after update:
+    Ceilândia: +0.00 l/s
+    ETA Brasília: +0.00 l/s
+    ETA Gama: +320.00 l/s
+    ETA Lago Norte: +0.00 l/s
+    ETA Paranoá: +132.77 l/s
+    ETA Planaltina: +0.00 l/s
+    ETA Rio Descoberto: +1693.14 l/s
+    ETA Sobradinho: +0.00 l/s
+    Guará: +0.00 l/s
+    Planaltina: +0.00 l/s
+    Plano Piloto: -563.40 l/s
+    Samambaia: +0.00 l/s
+    Sobradinho: -531.09 l/s
+    Taguatinga: -1051.42 l/s
+  Node Potentials after update:
+    Ceilândia: -13.3600
+    ETA Brasília: -3.3900
+    ETA Gama: +0.0000
+    ETA Lago Norte: -7.1100
+    ETA Paranoá: +0.0000
+    ETA Planaltina: -19.8000
+    ETA Rio Descoberto: +0.0000
+    ETA Sobradinho: -14.1900
+    Guará: -14.4900
+    Planaltina: -49.9400
+    Plano Piloto: -8.0800
+    Samambaia: -14.2500
+    Sobradinho: -16.9700
+    Taguatinga: -6.0800
+--------------------------------------------------
+Iteration 10:
+  Source Node: ETA Paranoá
+  Sink Node: Sobradinho
+  Path taken:
+    ETA Paranoá -> Sobradinho (forward)
+  Path distance (reduced cost): 0.0000
+  Flow augmented (delta): 132.77 l/s
+  Node Excesses after update:
+    Ceilândia: +0.00 l/s
+    ETA Brasília: +0.00 l/s
+    ETA Gama: +320.00 l/s
+    ETA Lago Norte: +0.00 l/s
+    ETA Paranoá: +0.00 l/s
+    ETA Planaltina: +0.00 l/s
+    ETA Rio Descoberto: +1693.14 l/s
+    ETA Sobradinho: +0.00 l/s
+    Guará: +0.00 l/s
+    Planaltina: +0.00 l/s
+    Plano Piloto: -563.40 l/s
+    Samambaia: +0.00 l/s
+    Sobradinho: -398.32 l/s
+    Taguatinga: -1051.42 l/s
+  Node Potentials after update:
+    Ceilândia: -13.3600
+    ETA Brasília: -3.3900
+    ETA Gama: +0.0000
+    ETA Lago Norte: -7.1100
+    ETA Paranoá: +0.0000
+    ETA Planaltina: -19.8000
+    ETA Rio Descoberto: +0.0000
+    ETA Sobradinho: -14.1900
+    Guará: -14.4900
+    Planaltina: -49.9400
+    Plano Piloto: -8.0800
+    Samambaia: -14.2500
+    Sobradinho: -16.9700
+    Taguatinga: -6.0800
+--------------------------------------------------
+Iteration 11:
+  Source Node: ETA Rio Descoberto
+  Sink Node: Taguatinga
+  Path taken:
+    ETA Rio Descoberto -> Taguatinga (forward)
+  Path distance (reduced cost): 0.0000
+  Flow augmented (delta): 1051.42 l/s
+  Node Excesses after update:
+    Ceilândia: +0.00 l/s
+    ETA Brasília: +0.00 l/s
+    ETA Gama: +320.00 l/s
+    ETA Lago Norte: +0.00 l/s
+    ETA Paranoá: +0.00 l/s
+    ETA Planaltina: +0.00 l/s
+    ETA Rio Descoberto: +641.72 l/s
+    ETA Sobradinho: +0.00 l/s
+    Guará: +0.00 l/s
+    Planaltina: +0.00 l/s
+    Plano Piloto: -563.40 l/s
+    Samambaia: +0.00 l/s
+    Sobradinho: -398.32 l/s
+    Taguatinga: +0.00 l/s
+  Node Potentials after update:
+    Ceilândia: -13.3600
+    ETA Brasília: -3.8600
+    ETA Gama: +0.0000
+    ETA Lago Norte: -7.1100
+    ETA Paranoá: +0.0000
+    ETA Planaltina: -19.8000
+    ETA Rio Descoberto: +0.0000
+    ETA Sobradinho: -14.1900
+    Guará: -14.4900
+    Planaltina: -49.9400
+    Plano Piloto: -8.5500
+    Samambaia: -14.2500
+    Sobradinho: -16.9700
+    Taguatinga: -6.0800
+--------------------------------------------------
+Iteration 12:
+  Source Node: ETA Rio Descoberto
+  Sink Node: Plano Piloto
+  Path taken:
+    ETA Rio Descoberto -> Plano Piloto (forward)
+  Path distance (reduced cost): 0.0000
+  Flow augmented (delta): 563.40 l/s
+  Node Excesses after update:
+    Ceilândia: +0.00 l/s
+    ETA Brasília: +0.00 l/s
+    ETA Gama: +320.00 l/s
+    ETA Lago Norte: +0.00 l/s
+    ETA Paranoá: +0.00 l/s
+    ETA Planaltina: +0.00 l/s
+    ETA Rio Descoberto: +78.32 l/s
+    ETA Sobradinho: +0.00 l/s
+    Guará: +0.00 l/s
+    Planaltina: +0.00 l/s
+    Plano Piloto: +0.00 l/s
+    Samambaia: +0.00 l/s
+    Sobradinho: -398.32 l/s
+    Taguatinga: +0.00 l/s
+  Node Potentials after update:
+    Ceilândia: -13.3600
+    ETA Brasília: -22.0700
+    ETA Gama: +0.0000
+    ETA Lago Norte: -35.6900
+    ETA Paranoá: -28.5800
+    ETA Planaltina: -48.3800
+    ETA Rio Descoberto: +0.0000
+    ETA Sobradinho: -42.7700
+    Guará: -14.4900
+    Planaltina: -78.5200
+    Plano Piloto: -26.7600
+    Samambaia: -14.2500
+    Sobradinho: -45.5500
+    Taguatinga: -6.0800
+--------------------------------------------------
+Iteration 13:
+  Source Node: ETA Rio Descoberto
+  Sink Node: Sobradinho
+  Path taken:
+    ETA Rio Descoberto -> Plano Piloto (forward)
+    Plano Piloto -> ETA Brasília (backward)
+    ETA Brasília -> Sobradinho (forward)
+  Path distance (reduced cost): 0.0000
+  Flow augmented (delta): 78.32 l/s
+  Node Excesses after update:
+    Ceilândia: +0.00 l/s
+    ETA Brasília: +0.00 l/s
+    ETA Gama: +320.00 l/s
+    ETA Lago Norte: +0.00 l/s
+    ETA Paranoá: +0.00 l/s
+    ETA Planaltina: +0.00 l/s
+    ETA Rio Descoberto: +0.00 l/s
+    ETA Sobradinho: +0.00 l/s
+    Guará: +0.00 l/s
+    Planaltina: +0.00 l/s
+    Plano Piloto: +0.00 l/s
+    Samambaia: +0.00 l/s
+    Sobradinho: -320.00 l/s
+    Taguatinga: +0.00 l/s
+  Node Potentials after update:
+    Ceilândia: -13.3600
+    ETA Brasília: -22.0700
+    ETA Gama: +0.0000
+    ETA Lago Norte: -35.6900
+    ETA Paranoá: -28.5800
+    ETA Planaltina: -48.3800
+    ETA Rio Descoberto: +0.0000
+    ETA Sobradinho: -42.7700
+    Guará: -14.4900
+    Planaltina: -78.5200
+    Plano Piloto: -26.7600
+    Samambaia: -14.2500
+    Sobradinho: -45.5500
+    Taguatinga: -6.0800
+--------------------------------------------------
+Iteration 14:
+  Source Node: ETA Gama
+  Sink Node: Sobradinho
+  Path taken:
+    ETA Gama -> Samambaia (forward)
+    Samambaia -> ETA Rio Descoberto (backward)
+    ETA Rio Descoberto -> Plano Piloto (forward)
+    Plano Piloto -> ETA Brasília (backward)
+    ETA Brasília -> Sobradinho (forward)
+  Path distance (reduced cost): 4.5800
+  Flow augmented (delta): 320.00 l/s
+  Node Excesses after update:
+    Ceilândia: +0.00 l/s
+    ETA Brasília: +0.00 l/s
+    ETA Gama: +0.00 l/s
+    ETA Lago Norte: +0.00 l/s
+    ETA Paranoá: +0.00 l/s
+    ETA Planaltina: +0.00 l/s
+    ETA Rio Descoberto: +0.00 l/s
+    ETA Sobradinho: +0.00 l/s
+    Guará: +0.00 l/s
+    Planaltina: +0.00 l/s
+    Plano Piloto: +0.00 l/s
+    Samambaia: +0.00 l/s
+    Sobradinho: -0.00 l/s
+    Taguatinga: +0.00 l/s
+  Node Potentials after update:
+    Ceilândia: -13.3600
+    ETA Brasília: -22.0700
+    ETA Gama: +0.0000
+    ETA Lago Norte: -35.6900
+    ETA Paranoá: -28.5800
+    ETA Planaltina: -48.3800
+    ETA Rio Descoberto: +0.0000
+    ETA Sobradinho: -42.7700
+    Guará: -14.4900
+    Planaltina: -78.5200
+    Plano Piloto: -26.7600
+    Samambaia: -14.2500
+    Sobradinho: -45.5500
+    Taguatinga: -6.0800
+--------------------------------------------------

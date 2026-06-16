@@ -1,0 +1,75 @@
+\section{Conclusão e Fechamento}
+
+\subsection{Conexão com Artigos de Schrödinger}
+\begin{frame}{Conexão com Schrödinger: O Salto Estocástico}
+  \small
+  \begin{itemize}
+    \item \textbf{O Salto Estocástico}: Se as demandas das RAs fossem modeladas como distribuições de probabilidade (ex: incerteza climática ou demográfica rápida), o problema determinístico clássico torna-se um \textbf{Problema de Ponte de Schrödinger (SBP) com informação parcial}.
+    \item \textbf{Algoritmo e Massa Variável} \cite{mascherpa2023estimating}:
+    \begin{itemize}
+      \scriptsize
+      \item O espalhamento de contaminantes ou flutuações de água é modelado como uma cadeia de Markov sobre o grafo, onde os estados são os trechos de tubulação.
+      \item Um algoritmo proximal entrópico baseado em iterações do tipo Sinkhorn é empregado para resolver instâncias onde a massa total não é constante e as margens inicial/final são apenas parcialmente observadas.
+    \end{itemize}
+  \end{itemize}
+\end{frame}
+
+\subsection{O Poder da Incerteza}
+\begin{frame}{O Poder da Incerteza: Regularização e Eficiência}
+  \small
+  \begin{block}{Paradoxo: Adicionar Ruído Melhora o Algoritmo}
+    {\footnotesize Em problemas de transporte ótimo, a introdução controlada de incerteza traz ganhos algorítmicos concretos.}
+  \end{block}
+
+  \begin{itemize}
+    \setlength{\itemsep}{8pt}
+    \item \textbf{Cuturi (2013) --- Regularização Entrópica} \cite{cuturi2013sinkhorn}: Adicionar entropia ao objetivo transforma o problema em operações matriciais simples (Sinkhorn), reduzindo drasticamente o custo computacional.
+    \item \textbf{Pontes de Schrödinger}: Ao modelar o transporte como processo estocástico, ganha-se estabilidade numérica e capacidade de tratar dados ruidosos ou parcialmente observados.
+    \item \textbf{Visão Unificada}: Determinístico $\rightarrow$ Regularizado $\rightarrow$ Estocástico forma um espectro onde cada nível de incerteza adiciona novas capacidades algorítmicas.
+  \end{itemize}
+\end{frame}
+
+\subsection{Conclusão}
+\begin{frame}{Conclusão}
+  \small
+  \begin{itemize}
+    \setlength{\itemsep}{12pt}
+    \item \textbf{Eficácia do Algoritmo}: O algoritmo Successive Shortest Path (SSP) resolve exatamente o MCF na instância de rede hídrica do DF, fornecendo a distribuição de custos mínimos.
+    \item \textbf{Perspectiva de Futuro}: O framework de pontes de Schrödinger atua como a generalização natural do nosso modelo determinístico para tratar incertezas dinâmicas reais.
+  \end{itemize}
+\end{frame}
+
+\subsection{Referências}
+\begin{frame}[allowframebreaks]{Referências}
+  \nocite{*}
+  \bibliographystyle{plain}
+  \bibliography{referencias}
+\end{frame}
+
+\subsection{Perguntas}
+{
+\setbeamercolor{normal text}{fg=unbazul}
+\setbeamercolor{structure}{fg=unbazul}
+\setbeamercolor{local structure}{fg=unbazul}
+\begin{frame}[plain]
+  \usebeamercolor[fg]{normal text}
+  \centering
+  \vspace{1.2cm}
+  \Huge \textbf{\color{unbazul}Obrigado!} \\
+  \vspace{0.6cm}
+  \Large \color{unbazul} Perguntas? \\
+  \vspace{0.8cm}
+  \begin{columns}[c]
+    \begin{column}{0.5\textwidth}
+      \centering
+      \includegraphics[height=2.2cm]{elementos/repositorio.png} \\
+      \vspace{0.1cm}
+      \scriptsize\color{unbazul} Repositório do Projeto
+    \end{column}
+    \begin{column}{0.5\textwidth}
+      \centering
+      \includegraphics[height=1.2cm]{elementos/unb_logo.jpg}
+    \end{column}
+  \end{columns}
+\end{frame}
+}

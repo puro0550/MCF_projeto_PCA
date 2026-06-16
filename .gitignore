@@ -19,3 +19,17 @@ __pycache__/
 
 # OS files
 .DS_Store
+
+# LaTeX temporary/build files
+*.aux
+*.log
+*.nav
+*.out
+*.snm
+*.toc
+*.blg
+*.bbl
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+

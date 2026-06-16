@@ -1,0 +1,558 @@
+\section{Formulação e Algoritmo}
+
+\subsection{Componentes do Modelo}
+\begin{frame}[shrink=5]{Componentes do Modelo de Otimização}
+  \small
+  \begin{block}{Correspondência com a Instância Hídrica}
+    \begin{itemize}
+      \item $x_{ij}$: Vazão (fluxo) de água alocada na adutora $(i,j)$ (em l/s).
+      \item $b_i$: Balanço do nó $i$. Se $b_i > 0$, é uma ETA (produção). Se $b_i < 0$, é uma RA (demanda). Se $b_i = 0$, é um nó de passagem.
+      \item $u_{ij}$: Capacidade máxima física de vazão na adutora $(i,j)$ (em l/s).
+      \item $c_{ij}$: Distância em linha reta em km (proxy para o custo de bombeamento).
+    \end{itemize}
+  \end{block}
+  
+  \begin{itemize}
+    \item A conservação de fluxo assegura que nenhuma água ``some'' ou é adicionada em trânsito.
+    \item A restrição de capacidade limita o fluxo ao máximo suportado pela tubulação física.
+  \end{itemize}
+\end{frame}
+
+\subsection{Formulação Formal do MCF}
+\begin{frame}{Formulação Matemática do Fluxo de Custo Mínimo}
+  O problema de alocação hídrica é modelado como um problema de \textbf{Fluxo de Custo Mínimo (MCF)}:
+  
+  $$\min \sum_{(i,j) \in A} c_{ij} x_{ij}$$
+  $$\text{sujeito a:} \quad \sum_{\{j: (i,j) \in A\}} x_{ij} - \sum_{\{j: (j,i) \in A\}} x_{ji} = b_i \quad \forall i \in V$$
+  $$0 \leq x_{ij} \leq u_{ij} \quad \forall (i,j) \in A$$
+\end{frame}
+
+\subsection{Grafo Residual}
+\begin{frame}{O Pulo do Gato: O Grafo Residual}
+  Para resolver o MCF de forma eficiente, a ideia central é trabalhar com o \textbf{grafo residual}: uma representação dinâmica que permite ao algoritmo corrigir decisões de fluxo anteriores.
+
+  \begin{itemize}
+    \item \textbf{Arcos forward}: Representam a capacidade ainda disponível para enviar mais fluxo.
+    \item \textbf{Arcos backward}: Permitem ``devolver'' fluxo já enviado, revertendo decisões subótimas.
+    \item \textbf{Consequência}: O algoritmo não fica preso em soluções parciais ruins --- ele sempre pode se autocorrigir.
+  \end{itemize}
+
+  \begin{center}
+    \scriptsize \textit{É essa estrutura que transforma uma heurística gulosa em um algoritmo exato.}
+  \end{center}
+\end{frame}
+
+\begin{frame}{Estrutura do Grafo Residual}
+  O grafo residual $G_x$ permite que o algoritmo retroceda decisões anteriores redirecionando fluxo pelas arestas reversas.
+  
+  \vspace{0.3cm}
+  \centering
+  \scalebox{0.8}{
+    \begin{tikzpicture}[scale=0.9]
+      % Original arc
+      \node[circle, draw=unbazul, fill=unbazul!10, thick] (u) at (0, 1.5) {$i$};
+      \node[circle, draw=unbazul, fill=unbazul!10, thick] (v) at (7, 1.5) {$j$};
+      \draw[->, thick, unbazul] (u) -- node[above, font=\tiny] {$x_{ij} \leq u_{ij}$, custo $c_{ij}$} (v);
+      
+      % Residual arcs
+      \node[circle, draw=unbazul, fill=unbazul!10, thick] (ur) at (0, -1.2) {$i$};
+      \node[circle, draw=unbazul, fill=unbazul!10, thick] (vr) at (7, -1.2) {$j$};
+      \draw[->, thick, unbverde, bend left=15] (ur) -- node[above, font=\tiny\color{unbverde}] {Forward: $r_{ij} = u_{ij} - x_{ij}$, custo $c_{ij}$} (vr);
+      \draw[->, thick, red, bend left=15] (vr) -- node[below, font=\tiny\color{red}] {Backward: $r_{ji} = x_{ij}$, custo $-c_{ij}$} (ur);
+      
+      \node[left, font=\footnotesize] at (-0.5, 1.5) {Arco Original:};
+      \node[left, font=\footnotesize] at (-0.5, -1.2) {Grafo Residual $G_x$:};
+    \end{tikzpicture}
+  }
+\end{frame}
+
+\subsection{Condições de Otimalidade}
+\begin{frame}{Condições de Otimalidade}
+  A teoria de otimização em redes fornece condições necessárias e suficientes para certificar que uma solução é ótima:
+
+  \begin{itemize}
+    \setlength{\itemsep}{10pt}
+    \item \textbf{Potenciais de nó} ($\pi_i$): Variáveis duais associadas à conservação de fluxo em cada nó da rede.
+    \item \textbf{Custos reduzidos} ($\bar{c}_{ij} = c_{ij} - \pi_i + \pi_j$): Ajustam os custos originais das arestas usando os potenciais, permitindo o uso de Dijkstra.
+    \item \textbf{Teorema de Otimalidade} \cite{ahuja1993network}: Uma solução viável é ótima se e somente se todos os custos reduzidos no grafo residual são não-negativos ($\bar{c}_{ij} \geq 0$).
+  \end{itemize}
+
+  \begin{center}
+    \scriptsize \textit{Os potenciais e custos reduzidos são a peça-chave que garante a corretude do SSP.}
+  \end{center}
+\end{frame}
+
+\subsection{Pseudocódigo do SSP}
+\begin{frame}[shrink=20]{Pseudocódigo do Algoritmo Successive Shortest Path}
+  O SSP resolve o MCF enviando fluxo de forma incremental ao longo de caminhos mínimos.
+  
+  \vspace{0.1cm}
+  \SetAlFnt{\footnotesize}
+  \SetAlCapFnt{\footnotesize}
+  \begin{algorithm}[H]
+    \caption{Successive Shortest Path}
+    \SetKwInOut{Input}{Entrada}\SetKwInOut{Output}{Saída}
+    \Input{Grafo $G=(V,A)$, balanços $b$, capacidades $u$, custos $c$}
+    \Output{Fluxo ótimo $x$}
+    \SetAlgoLined
+    Inicializa $x \leftarrow 0$ (fluxo nulo)\;
+    Calcula potenciais iniciais $\pi$ via Bellman-Ford\;
+    \While{existe nó $s$ com excesso $e(s) > 0$}{
+      Escolhe nó $t$ com déficit $e(t) < 0$\;
+      Encontra caminho $P$ de custo mínimo reduzido $\bar{c}$ de $s$ a $t$ em $G_x$ (Dijkstra com $\bar{c}_{ij} \geq 0$)\;
+      Atualiza potenciais $\pi_i \leftarrow \pi_i - d(i)$ para todo $i \in V$ (onde $d(i)$ é a distância de $s$ a $i$)\;
+      $\delta \leftarrow \min(e(s), -e(t), \min_{(i,j) \in P} r_{ij})$\;
+      Aumenta $\delta$ unidades de fluxo ao longo de $P$ no grafo $x$\;
+      Atualiza excessos: $e(s) \leftarrow e(s) - \delta$ e $e(t) \leftarrow e(t) + \delta$\;
+    }
+    \Return{$x$}\;
+  \end{algorithm}
+\end{frame}
+
+\subsection{Análise de Complexidade}
+\begin{frame}{Pseudocódigo Detalhado: Complexidade Nodal}
+  \small
+  \begin{itemize}
+    \item \textbf{Estruturas de Dados}:
+    \begin{itemize}
+      \scriptsize
+      \item Grafo residual $G_x$ como lista de adjacência dinâmica.
+      \item Lista/vetor linear para busca simples de menor distância no Dijkstra.
+      \item Vetores para potenciais $\pi$, excessos $e$ e fluxos ativos $x$.
+    \end{itemize}
+  \end{itemize}
+  
+  \begin{table}[h]
+    \centering
+    \tiny
+    \begin{tabular}{llll}
+      \toprule
+      \textbf{Linha} & \textbf{Operação} & \textbf{Estrutura} & \textbf{Complexidade} \\
+      \midrule
+      1 & Inicialização de Fluxos $x=0$ & Vetor & $O(E)$ \\
+      2 & Cálculo de potenciais $\pi$ iniciais & Bellman-Ford & $O(VE)$ \\
+      3 & Busca por nós fontes $s$ ($e(s)>0$) & Varredura linear & $O(V)$ \\
+      5 & Caminho Mínimo $P$ em $G_x$ & Dijkstra (com Lista) & $O(V^2)$ \\
+      6 & Atualização de $\pi_i \leftarrow \pi_i - d(i)$ & Vetor & $O(V)$ \\
+      7-9 & Envio de fluxo $\delta$ ao longo de $P$ & Busca Reversa & $O(V)$ \\
+      \bottomrule
+    \end{tabular}
+    \caption{Resumo das estruturas e custos computacionais do SSP por iteração}
+  \end{table}
+\end{frame}
+
+\begin{frame}{Análise de Complexidade}
+  \begin{itemize}
+    \setlength{\itemsep}{12pt}
+    \item \textbf{Inicialização (Bellman-Ford)}: Executado uma única vez para calcular os potenciais iniciais $\pi$. Custo: $O(VE)$.
+    \item \textbf{Custo por Iteração (Dijkstra em Lista)}: Busca por caminho mínimo com busca linear simples. Custo: $O(V^2)$ por iteração \cite{cormen2009introduction}.
+    \item \textbf{Número de Iterações}: No máximo $U$ iterações, onde $U = \displaystyle\sum_{b_i > 0} b_i$ é a soma dos excessos das fontes.
+    \item \textbf{Complexidade Total}: $O(VE + U \cdot V^2)$.
+  \end{itemize}
+\end{frame}
+
+
+\section{Execução na Instância}
+
+{
+\setbeamercolor{normal text}{fg=unbazul}
+\setbeamercolor{structure}{fg=unbazul}
+\setbeamercolor{local structure}{fg=unbazul}
+\begin{frame}[plain]
+  \usebeamercolor[fg]{normal text}
+  \centering
+  \vspace{2cm}
+  \begin{figure}
+    \includegraphics[height=1.5cm]{elementos/unb_logo.jpg}
+  \end{figure}
+  \Huge \textbf{\color{unbazul}Demonstração ao Vivo} \\
+  \vspace{0.5cm}
+  \large\color{unbazul} Executando o resolvedor em terminal: \\
+  \texttt{\color{unbazul}python ssp\_main.py} \\
+  \vspace{1.5cm}
+  \small\color{unbazul} \textit{Interface interativa do algoritmo SSP}
+\end{frame}
+}
+
+\subsection{Iterações do SSP}
+% Iteração 1
+\begin{frame}{SSP --- Iteração 1}
+  \small
+  \textbf{Aumento Local}: ETA Sobradinho $\rightarrow$ Sobradinho \hfill \textbf{Custo}: 5.56 | \textbf{Fluxo}: 570.00 l/s \\
+  \textit{Resultado}: Demanda suprida localmente (2.8 km).
+  
+  \vspace{0.1cm}
+  \centering
+  \scalebox{0.65}{
+\begin{tikzpicture}[
+    scale=0.9,
+    node/.style={circle, draw=unbazul, fill=unboffwhite, thick, minimum size=1.1cm, align=center, font=\tiny},
+    edge/.style={->, >=stealth, thin, draw=gray!35},
+    path_edge/.style={->, >=stealth, line width=2.5pt, draw=orange},
+    back_edge/.style={->, >=stealth, dashed, thin, draw=red!45},
+    edge_label/.style={font=\tiny, fill=white, inner sep=0.8pt, opacity=0.9, text opacity=1.0}
+]
+    \node[node] (ETARioDescoberto) at (0.0, 3.5) {\textbf{ETA}\\\textbf{Desc.} \\ $e = 4450.0$ \\ $\pi = 0.0$};
+    \node[node] (ETABrasilia) at (2.2, 3.5) {\textbf{ETA}\\\textbf{Bras.} \\ $e = 1200.0$ \\ $\pi = 0.0$};
+    \node[node] (ETALagoNorte) at (4.4, 3.5) {\textbf{ETA}\\\textbf{L.Nte} \\ $e = 700.0$ \\ $\pi = 0.0$};
+    \node[node] (ETAGama) at (6.6, 3.5) {\textbf{ETA}\\\textbf{Gama} \\ $e = 320.0$ \\ $\pi = 0.0$};
+    \node[node] (ETAParanoá) at (8.8, 3.5) {\textbf{ETA}\\\textbf{Par.} \\ $e = 300.0$ \\ $\pi = 0.0$};
+    \node[node] (ETASobradinho) at (11.0, 3.5) {\textbf{ETA}\\\textbf{Sob.} \\ $e = 570.0$ \\ $\pi = 0.0$};
+    \node[node] (ETAPlanaltina) at (13.2, 3.5) {\textbf{ETA}\\\textbf{Plan.} \\ $e = 60.0$ \\ $\pi = 0.0$};
+    \node[node] (Ceilandia) at (0.0, 0.0) {\textbf{Ceil.} \\ $e = -836.2$ \\ $\pi = 13.4$};
+    \node[node] (Samambaia) at (2.2, 0.0) {\textbf{Sam.} \\ $e = -852.7$ \\ $\pi = 14.2$};
+    \node[node] (Taguatinga) at (4.4, 0.0) {\textbf{Tag.} \\ $e = -1051.4$ \\ $\pi = 6.1$};
+    \node[node] (Guará) at (6.6, 0.0) {\textbf{Guará} \\ $e = -1068.0$ \\ $\pi = 11.1$};
+    \node[node] (PlanoPiloto) at (8.8, 0.0) {\textbf{Plano}\\\textbf{Piloto} \\ $e = -1763.4$ \\ $\pi = 4.7$};
+    \node[node] (Sobradinho) at (11.0, 0.0) {\textbf{Sobrad.} \\ $e = -1101.1$ \\ $\pi = 2.8$};
+    \node[node] (Planaltina) at (13.2, 0.0) {\textbf{Planalt.} \\ $e = -927.2$ \\ $\pi = 30.1$};
+    \draw[edge] (ETABrasilia) -- (PlanoPiloto);
+    \draw[edge] (ETABrasilia) -- (Guará);
+    \draw[edge] (ETABrasilia) -- (Taguatinga);
+    \draw[edge] (ETABrasilia) -- (Sobradinho);
+    \draw[edge] (ETAGama) -- (Samambaia);
+    \draw[edge] (ETAGama) -- (Guará);
+    \draw[edge] (ETAGama) -- (Ceilandia);
+    \draw[edge] (ETALagoNorte) -- (PlanoPiloto);
+    \draw[edge] (ETALagoNorte) -- (Sobradinho);
+    \draw[edge] (ETALagoNorte) -- (Guará);
+    \draw[edge] (ETALagoNorte) -- (Planaltina);
+    \draw[edge] (ETAParanoá) -- (PlanoPiloto);
+    \draw[edge] (ETAParanoá) -- (Sobradinho);
+    \draw[edge] (ETAParanoá) -- (Guará);
+    \draw[edge] (ETAPlanaltina) -- (Sobradinho);
+    \draw[edge] (ETAPlanaltina) -- (PlanoPiloto);
+    \draw[edge] (ETAPlanaltina) -- (Planaltina);
+    \draw[edge] (ETARioDescoberto) -- (Taguatinga);
+    \draw[edge] (ETARioDescoberto) -- (Ceilandia);
+    \draw[edge] (ETARioDescoberto) -- (Samambaia);
+    \draw[edge] (ETARioDescoberto) -- (Guará);
+    \draw[edge] (ETARioDescoberto) -- (PlanoPiloto);
+    \draw[path_edge] (ETASobradinho) -- (Sobradinho) node[pos=0.25, edge_label, sloped] {$(5.6; 600.0)$};
+    \draw[edge] (ETASobradinho) -- (PlanoPiloto);
+    \draw[edge] (ETASobradinho) -- (Guará);
+    \draw[edge] (ETASobradinho) -- (Planaltina);
+\end{tikzpicture}
+  }
+\end{frame}
+
+% Iteração 2
+\begin{frame}{SSP --- Iteração 2}
+  \small
+  \textbf{Aumento Local}: ETA Rio Descoberto $\rightarrow$ Ceilândia \hfill \textbf{Custo}: 0.00 | \textbf{Fluxo}: 836.17 l/s \\
+  \textit{Resultado}: Atendimento à maior demanda via adutora principal.
+  
+  \vspace{0.1cm}
+  \centering
+  \scalebox{0.65}{
+\begin{tikzpicture}[
+    scale=0.9,
+    node/.style={circle, draw=unbazul, fill=unboffwhite, thick, minimum size=1.1cm, align=center, font=\tiny},
+    edge/.style={->, >=stealth, thin, draw=gray!35},
+    path_edge/.style={->, >=stealth, line width=2.5pt, draw=orange},
+    back_edge/.style={->, >=stealth, dashed, thin, draw=red!45},
+    edge_label/.style={font=\tiny, fill=white, inner sep=0.8pt, opacity=0.9, text opacity=1.0}
+]
+    \node[node] (ETARioDescoberto) at (0.0, 3.5) {\textbf{ETA}\\\textbf{Desc.} \\ $e = 4450.0$ \\ $\pi = 0.0$};
+    \node[node] (ETABrasilia) at (2.2, 3.5) {\textbf{ETA}\\\textbf{Bras.} \\ $e = 1200.0$ \\ $\pi = 0.0$};
+    \node[node] (ETALagoNorte) at (4.4, 3.5) {\textbf{ETA}\\\textbf{L.Nte} \\ $e = 700.0$ \\ $\pi = 0.0$};
+    \node[node] (ETAGama) at (6.6, 3.5) {\textbf{ETA}\\\textbf{Gama} \\ $e = 320.0$ \\ $\pi = 0.0$};
+    \node[node] (ETAParanoá) at (8.8, 3.5) {\textbf{ETA}\\\textbf{Par.} \\ $e = 300.0$ \\ $\pi = 0.0$};
+    \node[node] (ETASobradinho) at (11.0, 3.5) {\textbf{ETA}\\\textbf{Sob.} \\ $e = 0.0$ \\ $\pi = 0.0$};
+    \node[node] (ETAPlanaltina) at (13.2, 3.5) {\textbf{ETA}\\\textbf{Plan.} \\ $e = 60.0$ \\ $\pi = 0.0$};
+    \node[node] (Ceilandia) at (0.0, 0.0) {\textbf{Ceil.} \\ $e = -836.2$ \\ $\pi = -13.4$};
+    \node[node] (Samambaia) at (2.2, 0.0) {\textbf{Sam.} \\ $e = -852.7$ \\ $\pi = -14.2$};
+    \node[node] (Taguatinga) at (4.4, 0.0) {\textbf{Tag.} \\ $e = -1051.4$ \\ $\pi = -6.1$};
+    \node[node] (Guará) at (6.6, 0.0) {\textbf{Guará} \\ $e = -1068.0$ \\ $\pi = -11.1$};
+    \node[node] (PlanoPiloto) at (8.8, 0.0) {\textbf{Plano}\\\textbf{Piloto} \\ $e = -1763.4$ \\ $\pi = -4.7$};
+    \node[node] (Sobradinho) at (11.0, 0.0) {\textbf{Sobrad.} \\ $e = -531.1$ \\ $\pi = -2.8$};
+    \node[node] (Planaltina) at (13.2, 0.0) {\textbf{Planalt.} \\ $e = -927.2$ \\ $\pi = -30.1$};
+    \draw[edge] (ETABrasilia) -- (PlanoPiloto);
+    \draw[edge] (ETABrasilia) -- (Guará);
+    \draw[edge] (ETABrasilia) -- (Taguatinga);
+    \draw[edge] (ETABrasilia) -- (Sobradinho);
+    \draw[edge] (ETAGama) -- (Samambaia);
+    \draw[edge] (ETAGama) -- (Guará);
+    \draw[edge] (ETAGama) -- (Ceilandia);
+    \draw[edge] (ETALagoNorte) -- (PlanoPiloto);
+    \draw[edge] (ETALagoNorte) -- (Sobradinho);
+    \draw[edge] (ETALagoNorte) -- (Guará);
+    \draw[edge] (ETALagoNorte) -- (Planaltina);
+    \draw[edge] (ETAParanoá) -- (PlanoPiloto);
+    \draw[edge] (ETAParanoá) -- (Sobradinho);
+    \draw[edge] (ETAParanoá) -- (Guará);
+    \draw[edge] (ETAPlanaltina) -- (Sobradinho);
+    \draw[edge] (ETAPlanaltina) -- (PlanoPiloto);
+    \draw[edge] (ETAPlanaltina) -- (Planaltina);
+    \draw[edge] (ETARioDescoberto) -- (Taguatinga);
+    \draw[path_edge] (ETARioDescoberto) -- (Ceilandia) node[pos=0.25, edge_label, sloped] {$(0.0; 6000.0)$};
+    \draw[edge] (ETARioDescoberto) -- (Samambaia);
+    \draw[edge] (ETARioDescoberto) -- (Guará);
+    \draw[edge] (ETARioDescoberto) -- (PlanoPiloto);
+    \draw[edge, bend left=12] (ETASobradinho) to (Sobradinho);
+    \draw[back_edge, bend right=12] (Sobradinho) to node[pos=0.65, edge_label, sloped] {$(0.0; 570.0)$} (ETASobradinho);
+    \draw[edge] (ETASobradinho) -- (PlanoPiloto);
+    \draw[edge] (ETASobradinho) -- (Guará);
+    \draw[edge] (ETASobradinho) -- (Planaltina);
+\end{tikzpicture}
+  }
+\end{frame}
+
+% Iteração 3
+\begin{frame}{SSP --- Iteração 3}
+  \small
+  \textbf{Aumento Local}: ETA Brasília $\rightarrow$ Guará \hfill \textbf{Custo}: 0.00 | \textbf{Fluxo}: 1067.97 l/s \\
+  \textit{Resultado}: Atendimento direto (11.1 km).
+  
+  \vspace{0.1cm}
+  \centering
+  \scalebox{0.65}{
+\begin{tikzpicture}[
+    scale=0.9,
+    node/.style={circle, draw=unbazul, fill=unboffwhite, thick, minimum size=1.1cm, align=center, font=\tiny},
+    edge/.style={->, >=stealth, thin, draw=gray!35},
+    path_edge/.style={->, >=stealth, line width=2.5pt, draw=orange},
+    back_edge/.style={->, >=stealth, dashed, thin, draw=red!45},
+    edge_label/.style={font=\tiny, fill=white, inner sep=0.8pt, opacity=0.9, text opacity=1.0}
+]
+    \node[node] (ETARioDescoberto) at (0.0, 3.5) {\textbf{ETA}\\\textbf{Desc.} \\ $e = 3613.8$ \\ $\pi = 0.0$};
+    \node[node] (ETABrasilia) at (2.2, 3.5) {\textbf{ETA}\\\textbf{Bras.} \\ $e = 1200.0$ \\ $\pi = 0.0$};
+    \node[node] (ETALagoNorte) at (4.4, 3.5) {\textbf{ETA}\\\textbf{L.Nte} \\ $e = 700.0$ \\ $\pi = 0.0$};
+    \node[node] (ETAGama) at (6.6, 3.5) {\textbf{ETA}\\\textbf{Gama} \\ $e = 320.0$ \\ $\pi = 0.0$};
+    \node[node] (ETAParanoá) at (8.8, 3.5) {\textbf{ETA}\\\textbf{Par.} \\ $e = 300.0$ \\ $\pi = 0.0$};
+    \node[node] (ETASobradinho) at (11.0, 3.5) {\textbf{ETA}\\\textbf{Sob.} \\ $e = 0.0$ \\ $\pi = -1.5$};
+    \node[node] (ETAPlanaltina) at (13.2, 3.5) {\textbf{ETA}\\\textbf{Plan.} \\ $e = 60.0$ \\ $\pi = 0.0$};
+    \node[node] (Ceilandia) at (0.0, 0.0) {\textbf{Ceil.} \\ $e = 0.0$ \\ $\pi = -13.4$};
+    \node[node] (Samambaia) at (2.2, 0.0) {\textbf{Sam.} \\ $e = -852.7$ \\ $\pi = -14.2$};
+    \node[node] (Taguatinga) at (4.4, 0.0) {\textbf{Tag.} \\ $e = -1051.4$ \\ $\pi = -6.1$};
+    \node[node] (Guará) at (6.6, 0.0) {\textbf{Guará} \\ $e = -1068.0$ \\ $\pi = -11.1$};
+    \node[node] (PlanoPiloto) at (8.8, 0.0) {\textbf{Plano}\\\textbf{Piloto} \\ $e = -1763.4$ \\ $\pi = -4.7$};
+    \node[node] (Sobradinho) at (11.0, 0.0) {\textbf{Sobrad.} \\ $e = -531.1$ \\ $\pi = -4.3$};
+    \node[node] (Planaltina) at (13.2, 0.0) {\textbf{Planalt.} \\ $e = -927.2$ \\ $\pi = -30.1$};
+    \draw[edge] (ETABrasilia) -- (PlanoPiloto);
+    \draw[path_edge] (ETABrasilia) -- (Guará) node[pos=0.55, edge_label, sloped] {$(0.0; 1200.0)$};
+    \draw[edge] (ETABrasilia) -- (Taguatinga);
+    \draw[edge] (ETABrasilia) -- (Sobradinho);
+    \draw[edge] (ETAGama) -- (Samambaia);
+    \draw[edge] (ETAGama) -- (Guará);
+    \draw[edge] (ETAGama) -- (Ceilandia);
+    \draw[edge] (ETALagoNorte) -- (PlanoPiloto);
+    \draw[edge] (ETALagoNorte) -- (Sobradinho);
+    \draw[edge] (ETALagoNorte) -- (Guará);
+    \draw[edge] (ETALagoNorte) -- (Planaltina);
+    \draw[edge] (ETAParanoá) -- (PlanoPiloto);
+    \draw[edge] (ETAParanoá) -- (Sobradinho);
+    \draw[edge] (ETAParanoá) -- (Guará);
+    \draw[edge] (ETAPlanaltina) -- (Sobradinho);
+    \draw[edge] (ETAPlanaltina) -- (PlanoPiloto);
+    \draw[edge] (ETAPlanaltina) -- (Planaltina);
+    \draw[edge] (ETARioDescoberto) -- (Taguatinga);
+    \draw[edge, bend left=12] (ETARioDescoberto) to (Ceilandia);
+    \draw[back_edge, bend right=12] (Ceilandia) to node[pos=0.65, edge_label, sloped] {$(0.0; 836.2)$} (ETARioDescoberto);
+    \draw[edge] (ETARioDescoberto) -- (Samambaia);
+    \draw[edge] (ETARioDescoberto) -- (Guará);
+    \draw[edge] (ETARioDescoberto) -- (PlanoPiloto);
+    \draw[edge, bend left=12] (ETASobradinho) to (Sobradinho);
+    \draw[back_edge, bend right=12] (Sobradinho) to node[pos=0.65, edge_label, sloped] {$(0.0; 570.0)$} (ETASobradinho);
+    \draw[edge] (ETASobradinho) -- (PlanoPiloto);
+    \draw[edge] (ETASobradinho) -- (Guará);
+    \draw[edge] (ETASobradinho) -- (Planaltina);
+\end{tikzpicture}
+  }
+\end{frame}
+
+% Iteração 9
+\begin{frame}{SSP --- Exemplo de Caminho Residual}
+  \small
+  \textbf{Caminho Aumentante Residual}: ETA Paranoá $\rightarrow$ Sobradinho $\rightarrow$ ETA Sobradinho $\rightarrow$ Planaltina \\
+  \textbf{Custo}: 0.00 | \textbf{Fluxo}: 167.23 l/s \hfill \textit{Nota}: Utiliza o arco reverso Sobradinho $\rightarrow$ ETA Sobradinho (reversão).
+  
+  \vspace{0.1cm}
+  \centering
+  \scalebox{0.65}{
+\begin{tikzpicture}[
+    scale=0.9,
+    node/.style={circle, draw=unbazul, fill=unboffwhite, thick, minimum size=1.1cm, align=center, font=\tiny},
+    edge/.style={->, >=stealth, thin, draw=gray!35},
+    path_edge/.style={->, >=stealth, line width=2.5pt, draw=orange},
+    back_edge/.style={->, >=stealth, dashed, thin, draw=red!45},
+    edge_label/.style={font=\tiny, fill=white, inner sep=0.8pt, opacity=0.9, text opacity=1.0}
+]
+    \node[node] (ETARioDescoberto) at (0.0, 3.5) {\textbf{ETA}\\\textbf{Desc.} \\ $e = 2761.1$ \\ $\pi = 0.0$};
+    \node[node] (ETABrasilia) at (2.2, 3.5) {\textbf{ETA}\\\textbf{Bras.} \\ $e = 0.0$ \\ $\pi = -3.4$};
+    \node[node] (ETALagoNorte) at (4.4, 3.5) {\textbf{ETA}\\\textbf{L.Nte} \\ $e = 0.0$ \\ $\pi = -7.1$};
+    \node[node] (ETAGama) at (6.6, 3.5) {\textbf{ETA}\\\textbf{Gama} \\ $e = 320.0$ \\ $\pi = 0.0$};
+    \node[node] (ETAParanoá) at (8.8, 3.5) {\textbf{ETA}\\\textbf{Par.} \\ $e = 300.0$ \\ $\pi = 0.0$};
+    \node[node] (ETASobradinho) at (11.0, 3.5) {\textbf{ETA}\\\textbf{Sob.} \\ $e = 0.0$ \\ $\pi = -14.2$};
+    \node[node] (ETAPlanaltina) at (13.2, 3.5) {\textbf{ETA}\\\textbf{Plan.} \\ $e = 0.0$ \\ $\pi = -19.8$};
+    \node[node] (Ceilandia) at (0.0, 0.0) {\textbf{Ceil.} \\ $e = 0.0$ \\ $\pi = -13.4$};
+    \node[node] (Samambaia) at (2.2, 0.0) {\textbf{Sam.} \\ $e = 0.0$ \\ $\pi = -14.2$};
+    \node[node] (Taguatinga) at (4.4, 0.0) {\textbf{Tag.} \\ $e = -1051.4$ \\ $\pi = -6.1$};
+    \node[node] (Guará) at (6.6, 0.0) {\textbf{Guará} \\ $e = 0.0$ \\ $\pi = -14.5$};
+    \node[node] (PlanoPiloto) at (8.8, 0.0) {\textbf{Plano}\\\textbf{Piloto} \\ $e = -1631.4$ \\ $\pi = -8.1$};
+    \node[node] (Sobradinho) at (11.0, 0.0) {\textbf{Sobrad.} \\ $e = -531.1$ \\ $\pi = -17.0$};
+    \node[node] (Planaltina) at (13.2, 0.0) {\textbf{Planalt.} \\ $e = -167.2$ \\ $\pi = -49.9$};
+    \draw[edge, bend left=12] (ETABrasilia) to (PlanoPiloto);
+    \draw[back_edge, bend right=12] (PlanoPiloto) to node[pos=0.65, edge_label, sloped] {$(0.0; 132.0)$} (ETABrasilia);
+    \draw[edge, bend left=12] (ETABrasilia) to (Guará);
+    \draw[back_edge, bend right=12] (Guará) to node[pos=0.65, edge_label, sloped] {$(0.0; 1068.0)$} (ETABrasilia);
+    \draw[edge] (ETABrasilia) -- (Taguatinga);
+    \draw[edge] (ETABrasilia) -- (Sobradinho);
+    \draw[edge] (ETAGama) -- (Samambaia);
+    \draw[edge] (ETAGama) -- (Guará);
+    \draw[edge] (ETAGama) -- (Ceilandia);
+    \draw[edge] (ETALagoNorte) -- (PlanoPiloto);
+    \draw[edge] (ETALagoNorte) -- (Sobradinho);
+    \draw[edge] (ETALagoNorte) -- (Guará);
+    \draw[edge, bend left=12] (ETALagoNorte) to (Planaltina);
+    \draw[back_edge, bend right=12] (Planaltina) to node[pos=0.65, edge_label, sloped] {$(0.0; 700.0)$} (ETALagoNorte);
+    \draw[edge] (ETAParanoá) -- (PlanoPiloto);
+    \draw[path_edge] (ETAParanoá) -- (Sobradinho) node[pos=0.40, edge_label, sloped] {$(0.0; 300.0)$};
+    \draw[edge] (ETAParanoá) -- (Guará);
+    \draw[edge] (ETAPlanaltina) -- (Sobradinho);
+    \draw[edge] (ETAPlanaltina) -- (PlanoPiloto);
+    \draw[edge, bend left=12] (ETAPlanaltina) to (Planaltina);
+    \draw[back_edge, bend right=12] (Planaltina) to node[pos=0.65, edge_label, sloped] {$(0.0; 60.0)$} (ETAPlanaltina);
+    \draw[edge] (ETARioDescoberto) -- (Taguatinga);
+    \draw[edge, bend left=12] (ETARioDescoberto) to (Ceilandia);
+    \draw[back_edge, bend right=12] (Ceilandia) to node[pos=0.65, edge_label, sloped] {$(0.0; 836.2)$} (ETARioDescoberto);
+    \draw[edge, bend left=12] (ETARioDescoberto) to (Samambaia);
+    \draw[back_edge, bend right=12] (Samambaia) to node[pos=0.65, edge_label, sloped] {$(0.0; 852.7)$} (ETARioDescoberto);
+    \draw[edge] (ETARioDescoberto) -- (Guará);
+    \draw[edge] (ETARioDescoberto) -- (PlanoPiloto);
+    \draw[edge, bend left=12] (ETASobradinho) to (Sobradinho);
+    \draw[path_edge, bend right=12] (Sobradinho) to node[pos=0.65, edge_label, sloped] {$(0.0; 570.0)$} (ETASobradinho);
+    \draw[edge] (ETASobradinho) -- (PlanoPiloto);
+    \draw[edge] (ETASobradinho) -- (Guará);
+    \draw[path_edge] (ETASobradinho) -- (Planaltina) node[pos=0.40, edge_label, sloped] {$(0.0; 1000.0)$};
+\end{tikzpicture}
+  }
+\end{frame}
+
+\section{Resultados da Otimização}
+
+\subsection{Resultados - Tabela de Alocação}
+\begin{frame}{Resultados --- Tabela de Alocação de Fluxos}
+  \begin{columns}[t]
+    \begin{column}{0.54\textwidth}
+      \setlength{\tabcolsep}{1.5pt}
+      \begin{table}
+        \centering
+        \tiny
+        \begin{tabular}{llrr}
+          \toprule
+          \textbf{Origem} & \textbf{Destino} & \textbf{Fluxo (l/s)} & \textbf{Uti. (\%)} \\
+          \midrule
+          Descoberto & Ceilândia & $836.17$ & $13.9\%$ \\
+          Descoberto & Guará & $1067.97$ & $53.4\%$ \\
+          Descoberto & Plano Piloto & $961.72$ & $48.1\%$ \\
+          Descoberto & Samambaia & $532.72$ & $8.9\%$ \\
+          Descoberto & Taguatinga & $1051.42$ & $17.5\%$ \\
+          Brasília & Plano Piloto & $801.68$ & $66.8\%$ \\
+          Brasília & Sobradinho & $398.32$ & $39.8\%$ \\
+          Gama & Samambaia & $320.00$ & \textbf{100.0\%} \\
+          Lago Norte & Planaltina & $700.00$ & $70.0\%$ \\
+          Paranoá & Sobradinho & $300.00$ & \textbf{100.0\%} \\
+          Planaltina & Planaltina & $60.00$ & $6.0\%$ \\
+          Sobradinho & Planaltina & $167.23$ & $16.7\%$ \\
+          Sobradinho & Sobradinho & $402.77$ & $67.1\%$ \\
+          \bottomrule
+        \end{tabular}
+      \end{table}
+    \end{column}
+    \begin{column}{0.46\textwidth}
+      \begin{block}{Síntese da Solução}
+        \begin{itemize}
+          \scriptsize
+          \item \textbf{Custo Total}: \\ \textbf{129.482 km$\cdot$l/s}
+          \item \textbf{Arcos Saturados} (100\%):
+          \begin{itemize}
+            \tiny
+            \item Gama $\rightarrow$ Samambaia
+            \item Paranoá $\rightarrow$ Sobradinho
+          \end{itemize}
+          \item \textbf{Arcos Ociosos}:
+          \begin{itemize}
+            \tiny
+            \item 13 adutoras adicionais operam com fluxo zero.
+          \end{itemize}
+        \end{itemize}
+      \end{block}
+    \end{column}
+  \end{columns}
+\end{frame}
+
+\subsection{Resultados - Grafo de Fluxos}
+\begin{frame}{Resultados --- Visualização Geográfica}
+  \begin{figure}
+    \centering
+    \scalebox{0.60}{
+\begin{tikzpicture}[
+    scale=0.9,
+    node/.style={circle, draw=unbazul, fill=unboffwhite, thick, minimum size=1.1cm, align=center, font=\tiny},
+    edge/.style={->, >=stealth, thin, draw=gray!35},
+    path_edge/.style={->, >=stealth, line width=2.5pt, draw=orange},
+    back_edge/.style={->, >=stealth, dashed, thin, draw=red!45},
+    edge_label/.style={font=\tiny, fill=white, inner sep=0.8pt, opacity=0.9, text opacity=1.0}
+]
+    \node[node] (ETARioDescoberto) at (0.0, 3.5) {\textbf{ETA}\\\textbf{Desc.} \\ $e = 0.0$ \\ $\pi = -4.6$};
+    \node[node] (ETABrasilia) at (2.2, 3.5) {\textbf{ETA}\\\textbf{Bras.} \\ $e = 0.0$ \\ $\pi = -26.6$};
+    \node[node] (ETALagoNorte) at (4.4, 3.5) {\textbf{ETA}\\\textbf{L.Nte} \\ $e = 0.0$ \\ $\pi = -40.3$};
+    \node[node] (ETAGama) at (6.6, 3.5) {\textbf{ETA}\\\textbf{Gama} \\ $e = 0.0$ \\ $\pi = 0.0$};
+    \node[node] (ETAParanoá) at (8.8, 3.5) {\textbf{ETA}\\\textbf{Par.} \\ $e = 0.0$ \\ $\pi = -33.2$};
+    \node[node] (ETASobradinho) at (11.0, 3.5) {\textbf{ETA}\\\textbf{Sob.} \\ $e = 0.0$ \\ $\pi = -47.4$};
+    \node[node] (ETAPlanaltina) at (13.2, 3.5) {\textbf{ETA}\\\textbf{Plan.} \\ $e = 0.0$ \\ $\pi = -53.0$};
+    \node[node] (Ceilandia) at (0.0, 0.0) {\textbf{Ceil.} \\ $e = 0.0$ \\ $\pi = -17.9$};
+    \node[node] (Samambaia) at (2.2, 0.0) {\textbf{Sam.} \\ $e = 0.0$ \\ $\pi = -18.8$};
+    \node[node] (Taguatinga) at (4.4, 0.0) {\textbf{Tag.} \\ $e = 0.0$ \\ $\pi = -10.7$};
+    \node[node] (Guará) at (6.6, 0.0) {\textbf{Guará} \\ $e = 0.0$ \\ $\pi = -19.1$};
+    \node[node] (PlanoPiloto) at (8.8, 0.0) {\textbf{Plano}\\\textbf{Piloto} \\ $e = 0.0$ \\ $\pi = -31.3$};
+    \node[node] (Sobradinho) at (11.0, 0.0) {\textbf{Sobrad.} \\ $e = -0.0$ \\ $\pi = -50.1$};
+    \node[node] (Planaltina) at (13.2, 0.0) {\textbf{Planalt.} \\ $e = 0.0$ \\ $\pi = -83.1$};
+    \draw[path_edge] (ETABrasilia) -- (PlanoPiloto) node[pos=0.25, edge_label, sloped] {$801.7/1200$};
+    \draw[edge] (ETABrasilia) -- (Guará);
+    \draw[edge] (ETABrasilia) -- (Taguatinga);
+    \draw[path_edge] (ETABrasilia) -- (Sobradinho) node[pos=0.40, edge_label, sloped] {$398.3/1000$};
+    \draw[path_edge] (ETAGama) -- (Samambaia) node[pos=0.55, edge_label, sloped] {$320.0/320$};
+    \draw[edge] (ETAGama) -- (Guará);
+    \draw[edge] (ETAGama) -- (Ceilandia);
+    \draw[edge] (ETALagoNorte) -- (PlanoPiloto);
+    \draw[edge] (ETALagoNorte) -- (Sobradinho);
+    \draw[edge] (ETALagoNorte) -- (Guará);
+    \draw[path_edge] (ETALagoNorte) -- (Planaltina) node[pos=0.40, edge_label, sloped] {$700.0/1000$};
+    \draw[edge] (ETAParanoá) -- (PlanoPiloto);
+    \draw[path_edge] (ETAParanoá) -- (Sobradinho) node[pos=0.40, edge_label, sloped] {$300.0/300$};
+    \draw[edge] (ETAParanoá) -- (Guará);
+    \draw[edge] (ETAPlanaltina) -- (Sobradinho);
+    \draw[edge] (ETAPlanaltina) -- (PlanoPiloto);
+    \draw[path_edge] (ETAPlanaltina) -- (Planaltina) node[pos=0.25, edge_label, sloped] {$60.0/1000$};
+    \draw[path_edge] (ETARioDescoberto) -- (Taguatinga) node[pos=0.55, edge_label, sloped] {$1051.4/6000$};
+    \draw[path_edge] (ETARioDescoberto) -- (Ceilandia) node[pos=0.25, edge_label, sloped] {$836.2/6000$};
+    \draw[path_edge] (ETARioDescoberto) -- (Samambaia) node[pos=0.40, edge_label, sloped] {$532.7/6000$};
+    \draw[path_edge] (ETARioDescoberto) -- (Guará) node[pos=0.25, edge_label, sloped] {$1068.0/2000$};
+    \draw[path_edge] (ETARioDescoberto) -- (PlanoPiloto) node[pos=0.40, edge_label, sloped] {$961.7/2000$};
+    \draw[path_edge] (ETASobradinho) -- (Sobradinho) node[pos=0.25, edge_label, sloped] {$402.8/600$};
+    \draw[edge] (ETASobradinho) -- (PlanoPiloto);
+    \draw[edge] (ETASobradinho) -- (Guará);
+    \draw[path_edge] (ETASobradinho) -- (Planaltina) node[pos=0.40, edge_label, sloped] {$167.2/1000$};
+\end{tikzpicture}
+    }
+    \caption{Visualização da Solução Ótima SSP (Adutoras Ativas em Laranja)}
+  \end{figure}
+  \vspace{-0.3cm}
+  \begin{center}
+    \scriptsize \color{unbazul} \textbf{Nota}: Consulte o mapa georreferenciado interativo no arquivo \texttt{mapa\_interativo.html} para visualização sobre o relevo e Lago Paranoá.
+  \end{center}
+\end{frame}
+
+\subsection{Sensibilidade e Limitações}
+\begin{frame}[shrink=5]{Limitações e Análise de Sensibilidade}
+  Embora o modelo SSP forneça a melhor alocação sob custos lineares determinísticos, apresenta limitações estruturais:
+  
+  \begin{itemize}
+    \item \textbf{Custo Linear vs. Custo Não-Linear}: Modelamos o custo de transporte linearmente com a distância. Em redes hidráulicas reais, a perda de carga segue modelos não-lineares (\textbf{Hazen-Williams} ou \textbf{Darcy-Weisbach}).
+    \item \textbf{Pressão Nodal}: Ignoramos limites mínimos de pressão requeridos para o funcionamento dos ramais de distribuição.
+    \item \textbf{Altimetria}: O relevo do Distrito Federal (topologia 3D) impõe custos adicionais de elevação hidrostática (bombeamento morro acima).
+    \item \textbf{Incerteza}: As demandas são tomadas como estáticas, mas variam dinamicamente ao longo do dia.
+  \end{itemize}
+\end{frame}

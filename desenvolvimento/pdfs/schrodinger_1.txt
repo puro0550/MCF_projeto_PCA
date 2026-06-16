@@ -1,0 +1,1009 @@
+European Journal of Control 74 (2023) 100846
+
+Contents lists available at ScienceDirect
+
+European Journal of Control
+journal homepage: www.elsevier.com/locate/ejcon
+
+Estimating pollution spread in water networks as a Schrödinger bridge
+problem with partial informationR
+Michele Mascherpa a,∗, Isabel Haasler b, Bengt Ahlgren c, Johan Karlsson a
+a
+
+Department of Mathematics, KTH Royal Institute of Technology, Stockholm, Sweden
+LTS4, École Polytechnique Fédérale de Lausanne, Switzerland
+c
+RISE Research Institutes of Sweden, Stockholm, Sweden
+b
+
+a r t i c l e
+
+i n f o
+
+Article history:
+Received 14 May 2023
+Accepted 8 June 2023
+Available online 16 June 2023
+Recommended by Prof. T Parisini
+Keywords:
+Optimization algorithms
+Markov processes
+Sensor and signal fusion
+Schrödinger bridge
+
+a b s t r a c t
+Incidents where water networks are contaminated with microorganisms or pollutants can result in a large
+number of infected or ill persons, and it is therefore important to quickly detect, localize and estimate the
+spread and source of the contamination. In many of today’s water networks only limited measurements
+are available, but with the current internet of things trend the number of sensors is increasing and there
+is a need for methods that can utilize this information. Motivated by this fact, we address the problem
+of estimating the spread of pollution in a water network given measurements from a set of sensors. We
+model the water ﬂow as a Markov chain, representing the system as a set of states where each state
+represents the amount of water in a speciﬁc part of the network, e.g., a pipe or a part of a pipe. Then we
+seek the most likely ﬂow of the pollution given the expected water ﬂow and the sensors observations.
+This is a large-scale optimization problem that can be formulated as a Schrödinger bridge problem with
+partial information, and we address this by exploiting the connection with the entropy regularized multimarginal optimal transport problem. The software EPANET is used to simulate the spread of pollution
+in the water network and will be used for testing the performance of the methodology.
+© 2023 The Author(s). Published by Elsevier Ltd on behalf of European Control Association.
+This is an open access article under the CC BY license (http://creativecommons.org/licenses/by/4.0/)
+
+1. Introduction
+The World Health Organization recognizes access to safe
+drinking-water as essential to health, a basic human right and a
+component of effective policy for health protection [23]. At the
+same time, failure to ensure drinking-water safety may expose the
+community to the risk of outbreaks of infectious diseases. The possible sources of contamination include pathogens and toxic chemicals, which can potentially enter water distribution systems as a
+result of malicious attacks, infrastructures aging or natural disasters [6,7,15,29]. The traditional laboratory-based methods for detection of pollution in water networks do not provide real-time
+public health protection. A signiﬁcant measure that can be applied in order to mitigate the consequences of a contamination
+is the strategic placement of online water quality sensors [2]. The
+
+R
+This work was supported by KTH Digital Futures, the Knut and Alice Wallenberg
+foundation under grant KAW 2021.0274, and the Swedish Research Council (VR) under grant 2020-03454.
+∗
+Corresponding author.
+E-mail addresses: micmas@kth.se (M. Mascherpa), isabel.haasler@epﬂ.ch (I.
+Haasler), bengt.ahlgren@ri.se (B. Ahlgren), johan.karlsson@math.kth.se (J. Karlsson).
+
+parameters that are typically measured for early warning systems
+include, among others, pH, chlorine, temperature, ﬂow and turbidity [33]. It has been shown that the variation of such parameters
+can be used to detect various types of chemical and biological contaminants [13,21]. Furthermore, recently, a large number of low
+cost sensors are becoming available [18,27]. The availability of realtime sensor measurements allows for the development of applications in a large number of areas, ranging from detection of leakage and sensor errors [20,32], and real-time control of reservoirs
+[16] to applications in cyberphysical security [24]. In addition to
+these newly developed methods there are also public domain software packages, such as EPANET (Environmental Protection Agency
+Network Evaluation Tool) [28], that can be used for real-time simulation of water networks.
+Online sensing and real-time computations open up for development of new solutions for detection and estimation of pollution
+in water distribution systems, and with the aim of using the data
+produced by these sensors we propose a novel approach to estimate the spread of pollution in water networks, given the measurements from a set of sensors. Our approach is based on Markov
+modelling of the water diffusion in networks, where the states
+of the Markov chain are pipe segments. A related approach has
+
+https://doi.org/10.1016/j.ejcon.2023.100846
+0947-3580/© 2023 The Author(s). Published by Elsevier Ltd on behalf of European Control Association. This is an open access article under the CC BY license
+(http://creativecommons.org/licenses/by/4.0/)
+
+M. Mascherpa, I. Haasler, B. Ahlgren et al.
+
+European Journal of Control 74 (2023) 100846
+
+been developed to model the spread of pathogen particles in the
+air [5]. In that case, an indoor environment has been divided into
+boxes, which correspond to the states of the Markov chain. Once
+we model the water network as a Markov chain, we aim to ﬁnd
+the most likely ﬂow of pollution given the expected water ﬂow
+and the sensors observations. This results in a large-scale optimization problem, which we formulate as a Schrödinger bridge problem
+with partial information. The Schrödinger bridge problem is a classical problem in statistical mechanics [19,30]. Given two observations of a particle distribution at two time instances, and a prior on
+the particle evolutions (in the classical setting this is the Brownian
+motion), the Schrödinger bridge describes the most likely evolution of the particle distributions. It turns out that the most likely
+evolution can be characterized as the one that minimizes the relative entropy to the prior, while also satisfying the observations. A
+discretized version of the Schrödinger bridge problem is based on
+modelling the particle evolutions as a Markov chain [11,25]. The
+problem can be eﬃciently solved by an iterative scheme, which is
+linked to the so called Sinkhorn iterations for the optimal transport
+problem [1,9,12]. Optimal transport methods have previously been
+used for inference problems [31], and they have shown to provide
+a robust metric in hydrologic systems [22].
+In this work we utilize the discrete Schrödinger bridge to model
+the spread of pollution particles in a water network. We augment
+the framework to the settings, where only partial observations of
+the particle distributions are known. This corresponds to the fact
+that observations of the pollution spread can only be made at a
+few locations in the network, where sensors are placed. We solve
+the obtained optimization problem by developing a computational
+method for the Schrödinger bridge problem with partial information.
+The outline of the paper is as follows: Section 2 provides
+background material on the Schrödinger bridge problem. In
+Section 3, which contains the main contribution, we formulate the
+Schrödinger bridge problem in the case of partial observations, and
+we develop an iterative algorithm for solving it. In Section 4 we
+explain how water networks can be modelled as Markov chains.
+Then, in Section 5 we combine the results of the previous two
+sections to provide an example of application of the Schrödinger
+bridge problem to a water network with sensors observations.
+
+evolution matrix M is
+
+Pμ0 ,A (M ) =
+
+n
+
+
+
+
+( μ0 ) i
+
+ n
+
+
+
+mi1 , mi2 , . . . , min
+
+i=1
+
+
+m
+ai j i j
+
+,
+
+(1)
+
+j=1
+
+where ·,...· ,· denotes a multinomial coeﬃcient. It can be shown
+that if the number of particles is large, then the log-likelihood of
+(1) can be approximated in terms of a KL divergence.
+Deﬁnition 1. Let p and q be two nonnegative vectors or matrices
+of the same dimension. The normalized Kullback–Leibler (KL) divergence between p from q is deﬁned as
+
+H ( p|q ) :=
+
+pi
+qi
+
+pi log
+i
+
+− pi + qi ,
+
+where 0 log 0 is deﬁned to be 0.
+Proposition 1 ([11]). Given the transition matrix A, let μ0(N ) ∈ Nn
+be a sequence of distributions with N particles, and M (N ) ∈ Nn×n be
+a sequence of mass transfer matrices such that M (N ) 1 = μ0(N ) and
+
+supp(M (N ) ) ⊆ supp(diag(μ0(N ) )A ). Then there exists a constant C > 0
+such that for all N it holds that
+
+
+
+
+
+
+log Pμ0(N), A (M (N ) ) + H M (N )  diag(μ0(N ) )A  ≤ C log(N ).
+
+
+This means that as the number of particles becomes large, the
+negative log-likelihood of a given transition can be approximated
+by the relative entropy,
+
+Pμ(N ), A (M
+
+(N )
+
+0
+
+)≈e
+
+−H M (N )
+
+
+ diag(μ0(N) )A
+
+.
+
+Note that the relative entropy expression allows us to consider particles as continuous quantities, i.e., M ∈ Rn+×n . This represents the
+fact that, as the number of particles becomes large, the discrete
+particle distributions can be approximated by densities. A feasible
+evolution matrix between the two particle distributions μ0 ∈ Rn+
+and μ1 ∈ Rn+ must satisfy M1 = μ0 and MT 1 = μ1 . Thus, the most
+likely evolution matrix M between the two distributions can be approximated by the solution to
+
+minimize
+
+H (M | diag(μ0 )A )
+
+subject to
+
+M 1 = μ0 , M T 1 = μ1 .
+
+M∈Rn×n
+
+2. Background
+2.1. Notation
+
+(2)
+
+The Schrödinger bridge problem can be extended to a Markov
+chain of length τ . Then, given the distributions μ0 and μτ , at time
+0 and τ , respectively, we can ﬁnd the most likely evolution of the
+particles between them by solving
+
+By , , exp(· ), log(· ) we denote element-wise multiplication,
+division, exponential and logarithm of matrices and vectors. With
+1 we denote a column vector of ones of adequate size, supp(· ) indicates the support of a matrix, i.e., the non-zero elements.
+
+minimize
+M[0:τ −1] ,
+
+μ[1:τ −1]
+
+subject to
+
+2.2. Schrödinger bridge problem
+In this section we introduce the discrete Schrödinger bridge
+problem, in which particle dynamics are modelled as a Markov
+chain [11,25]. More precisely, we assume that, given a cloud of
+indistinguishable particles, each of them evolves over a set of n
+states X = {X1 , X2 , . . . , Xn }. Let qt denote the state of a particle at
+time t. Then the underlying
+probability law is given by a state tran n
+sition matrix A = ai j
+, where ai j = P (qt+1 = X j |qt = Xi ).
+
+τ
+
+t=1 H
+
+(Mt | diag(μt )A )
+
+Mt 1 = μt , (Mt )T 1 = μt+1 ,
+for t = 0, . . . , τ − 1.
+
+(3)
+
+This problem can be understood as a time and space discrete form
+of the Schrödinger bridge [11,12,25].
+3. Problem formulation and main results
+In this section we will formulate the problem of estimating the
+pollution spread in a water network using an optimization problem
+similar to (3) and then, by considering the dual problem, we determine an eﬃcient method for solving it that works also for large
+scale problems. To this end, consider a water network divided into
+n states, each representing a pipe-segment. We will model the evolution of the pollution over τ time instances, and we assume that
+each pollution particle evolves independently of each other and according to a Markov chain over these n states. Then we may use
+
+i, j=1
+
+Consider two observed particle distributions, described by vectors μt ∈ Nn for time t ∈ {0, 1}. Here the ith element (μt )i denotes
+the number of particles in state Xi at time t. The particle evolution
+is characterized by a matrix M = [mi j ]ni, j=1 , where mi j denotes the
+number of particles that transit from state Xi to state X j .
+Given the initial distribution μ0 and the transition probability
+matrix A, the probability that particles transition according to the
+2
+
+M. Mascherpa, I. Haasler, B. Ahlgren et al.
+
+European Journal of Control 74 (2023) 100846
+
+the same model as in Section 2.2. We indicate with At the state
+transition matrix at time t, which is assumed to be know, and
+may be estimated from the water-ﬂow. Moreover, let Mt = [mt ]i j
+describe the ﬂow of pollution, i.e., mti j indicates the amount of pollution that transitions from state i to state j between the times t
+and t + 1. We assume that sensors at a few given locations (states)
+in the water network measure the amount of pollution, and these
+states are denoted by π = (π1 , π2 , . . . , πk ). The measured pollution
+levels at these k states are described by vectors ρt ∈ Rk , for t ≥ 1.
+We introduce the matrix B = [eπ1 , . . . , eπk ]T ∈ {0, 1}k×n , where ei is
+the ith (column) vector of the canonical basis. Then, the matrix B
+has a nonzero column i if state i is known for all times. Here, also
+let 1C ∈ {0, 1}n denote the vector with ones in the unknown states,
+i.e., 1C = (I − BT B )1. In addition, we assume that we have complete
+information of the pollution at the initial time, denoted by ρ0 ∈ Rn .
+Now we formulate the following problem with a similar structure
+as (3):
+τ −1
+
+minimize
+M[0:τ −1]
+
+H (Mt | diag(Mt 1 )At )
+
+corresponding to the constraints (4b), (4c), (4d), and (4e), respectively. We obtain the Lagrangian
+
+L(M, λ, ν ) = H (M0 | diag(ρ0 )A0 )
+τ −1
+
++
+t=1
+
+τ −1
+
++
+
+BMt 1 = ρt
+
+for t = 1, . . . , τ −1,
+
+B(Mτ −1 )T 1 = ρτ ,
+M 1 = (M
+t
+
+) 1
+
+t−1 T
+
+τ −1
+
++
+
+Mit j
+∂L
+= log
+− (BT λt )i + (νt )i − (νt+1 ) j = 0.
+t
+t
+∂ Mi j
+Ai j ( M t 1 )i
+
+subject to
+
+τ
+
+t=0
+
+λtT ρt − (ρ0  exp(λ0 ))TA0 exp(ν1 )
+
+For the derivative of the entropy term we have used that At is row
+stochastic for t = 0, . . . , τ − 1. This leads to
+
+(4b)
+
+Mit j = (Mt 1 )i Ati j exp((BT λt )i − (νt )i + (νt+1 ) j ),
+Mt = diag(Mt 1  exp(BT λt )  exp(νt ))At diag(exp(νt+1 )).
+M0 = diag(ρ0  exp(λ0 ))A0 diag(exp(ν1 )),
+
+(5c)
+
+Mτ −1 = diag (Mτ −1 1 )  exp(BT λτ −1 )  exp(ντ −1 )
+× Aτ −1 diag exp(BT λτ ) .
+
+exp(BT λτ −1 )  exp(ντ −1 ))  Aτ −1 exp(BT λτ ) ≤ 1
+exp(BT λt )  exp(νt ))  At exp(νt+1 ) ≤ 1
+
+L(M∗ , λ, ν ) =
+
+τ
+
+λtT ρt − (ρ0  exp(λ0 ))T A0 exp(ν1 ),
+
+(14)
+
+t=0
+
+where we ignored the constant term ρ0T 1 that result from the
+normalizing terms in the deﬁnition of entropy. By maximizing
+(14) with respect to λt and νt , together with constraints (13), we
+obtain the dual problem (5). 
+Note that, since ρ0 is known, the optimal transport matrices Mt ,
+for t = 0, 1, . . . , τ , can be sequentially computed from (11), (10),
+and (12), for any set of dual variables, making use of the constraints (4e). Moreover, the dual formulation can be simpliﬁed by
+eliminating the variables νt for t = 1, . . . , τ , as described by the following Corollary.
+
+Proof. First note that the objective function (4a), due to the constraint (4b), can be rewritten as
+
+H (Mt | diag(Mt 1 )At ).
+
+(13)
+
+for t = 1, . . . , τ − 2, and one can see that this must hold by multiplying (10) or (12) by 1. Note that strict inequality can only hold
+when the corresponding entries of Mt are zero. If (13) does not
+hold, one can ﬁnd a (non-negative) descent direction for one of
+the variables Mt for which the objective converges to −∞.
+Finally, plugging (10)–(12) into the Lagrangian (7), we obtain
+that
+
+where λ0 , λt , λτ , νt are the Lagrangian multipliers corresponding respectively to constraints (4b), (4c), (4d), and (4e).
+
+τ −1
+
+(12)
+
+Since the problem is convex, an optimal set of variables {Mt }t satisﬁes (10)–(12) if they exist. Existence of such an optimal solution
+is ensured by
+
+for t = 1, . . . , τ − 2,
+
+H (M0 | diag(ρ0 )A0 ) +
+
+(11)
+
+while, for t = τ − 1, we get
+
+(5a)
+
+exp(BT λt )  At exp(νt+1 ) ≤ exp(νt )
+
+(10)
+
+Proceeding in the same way we obtain, for t = 0,
+
+(4e)
+
+(5b)
+
+(9)
+
+for t = 1, . . . , τ − 2, which in matrix form also can be written as,
+
+(4c)
+
+exp(B λτ −1 )  Aτ −1 exp(BT λτ ) ≤ exp(ντ −1 ),
+T
+
+(8)
+
+(4a)
+
+Theorem 1. A dual of the minimization problem (4) is given by
+λ[0:τ ] ,ν [1:τ −1]
+
+(7)
+
+Taking the derivative with respect to Mti j and setting it equal to
+zero, we get for t = 1, . . . , τ − 2 that
+
+In particular, this optimization problem extends problem (3) by
+adding partial constraints on the distributions at time instances
+t > 1. Thus, it can be seen as a Schrödinger bridge problem, where
+at each time instance partial information of the particle distributions is available. As an extension to the Schrödinger bridge framework, we believe that problem (4) may be of general interest to
+the control community. In particular, we envision applications to
+various other settings of estimation and control for large group
+of agents, where partial state information is given, cf. [10,31]. An
+advantage of the Schrödinger bridge framework is that it requires
+only a few model assumptions, and its optimal solution is robust to
+errors in the assumed underlying model deﬁned by the transition
+probabilities At [11,26].
+Next we derive an algorithm for solving (4), which is based on
+a dual block coordinate ascent method.
+
+maximize
+
+νtT (Mt 1 − (Mt−1 )T 1 ).
+
+t=1
+
+(4d)
+for t = 1, . . . , τ −1.
+
+λtT (ρt − BMt 1 ) + λTτ (ρτ − B(Mτ −1 )T 1 )
+
+t=1
+
+t=0
+
+subject to M0 1 = ρ0 ,
+
+H (Mt | diag(Mt 1 )At ) + λT0 (ρ0 − Mt 1 )
+
+(6)
+
+Corollary 1. The dual problem (5) can be equivalently formulated as:
+
+t=1
+
+τ
+
+Then we relax all the constraints, indicating with λ0 , λt (t =
+1, . . . , τ − 1 ), λτ , νt (t = 1, . . . , τ − 1 ) the Lagrangian multipliers
+
+max
+
+λt[0:τ ] t=0
+
+3
+
+λtT ρt − ρ0T diag(u0 )A0 diag(u1 ) . . . diag(uτ −1)Aτ −1 uτ ,
+
+(15)
+
+M. Mascherpa, I. Haasler, B. Ahlgren et al.
+
+European Journal of Control 74 (2023) 100846
+
+where u0 = exp(λ0 ) and ut = exp(BT λt ) for t = 1, . . . , τ .
+
+Let us recall that u0 = exp(λ0 ) and ut = exp(BT λt ) for t ≥ 1. With
+ )T u , thus taking
+this notation, the second term of (15) is −(φt  φ
+t
+t
+the derivative of the objective function (15) with respect to λt and
+setting it to zero we obtain:
+
+Proof. We will show that the problems are equivalent in the sense
+that for any ﬁxed set of variables λt (t = 0, . . . , τ ), the objective
+value (15) corresponds to the objective of (5) with the feasible
+variables νt (t = 1, . . . , τ − 1 ) that maximize the objective. Note
+that νt only appears for t = 1 in the objective function of (5), and
+since ρ0 and A0 are nonnegative, the maximizing choice of νt for
+t = 2, . . . , τ − 1 is the one that minimizes ν1 elementwise. This is
+achieved by selecting νt in such a way that equality holds ﬁrst for
+t = τ − 1 in (5b) and then for t = τ − 2, τ − 3, . . . , 1 in (5c). With
+this selection, we recursively deﬁne the variables wt := exp(νt ) for
+t = 1, . . . , τ − 1 as
+
+wτ −1 = uτ −1  Aτ −1 uτ ,
+
+,
+ρ 0 = φ0  u 0  φ
+0
+ , t ≥ 1.
+ρt = Bφt  But  Bφ
+t
+
+We observe that
+Therefore from
+(20) we can extract an update rule for λt . As the objective function is continuously differentiable and the problem is convex, the
+block coordinate ascent method converges Bertsekas [3, Proposition 2.7.1]. 
+
+(16)
+
+Given the limit point of Algorithm 1, the estimates for the
+marginals of the mass transfer matrices can be obtained as
+
+and
+
+wt = ut  At wt+1 ,
+
+t = 1, . . . , τ − 2,
+
+ u ,
+Mt 1 = φt  φ
+t
+t
+
+(17)
+
+(21)
+
+This can be seen by using the expression for the mass transfer matrices (10)–(12) together with the recursions (16), (17).
+
+The problems (5) and (15) are convex since they are dual problems. However, the convexity can also be seen directly by not
+ing that any term on the form exp( t ηtT λt ) is convex. Problem
+(15) has similarities to the dual of the entropy regularized optimal transport problem (see, e.g., [12]); the latter can be eﬃciently
+solved using a block coordinate ascent method. In fact, it turns
+out that the same approach yields a computationally eﬃcient algorithm that allows for solving problem (15) even in large scale
+settings.
+
+4. Modelling water ﬂow as a Markov chain
+We want to model the transition of pollution inside a water
+network as regulated by a Markov chain, in which the states are
+pipe segments. Pollution is assumed to be homogeneously diluted
+in the water of each segment, therefore we need to determine
+where the water of every pipe ﬂows during each time interval. We
+start by considering a line network (i.e. without bifurcation), then
+we switch to the case of a generic water network.
+
+ ∈ Rn for t = 0, . . . , τ be positive initial
+Proposition 2. Let ut , φt , φ
+t
+values. Then the solution of the dual problem (15) can be found as
+the limit point of Algorithm 1.
+
+
+4.1. Network without bifurcation
+Let us consider a water network composed of N pipes that is
+indexed with I = {1, . . . , N}. Without loss of generality, we assume
+that water ﬂows according to the order of the pipes. We consider
+a discrete-time problem, with intervals of uniform length t. We
+assume that water enters the system from the ﬁrst node, which
+can be considered a reservoir, and goes out from the last node,
+which has a positive demand. For the moment, we also assume
+that pipes do not split the network in multiple branches, i.e. water
+always ﬂows from pipe i to pipe i + 1, and they are all consecutive
+from the reservoir to the demand node.
+We address the problem of ﬁnding the probability transition
+matrix of water moving through pipes. In general the system will
+not be stationary, since we allow demand to vary with time. Therefore, for each time step t we look for a transition matrix At =
+[atik ]i,k∈I , in which atik is the probability for a random particle of
+water in pipe i at time t to go to pipe k at time t + 1. Each pipe
+i has a ﬁxed volume Vi . We also know the ﬂow of water Fi (t ) (i.e.
+the volume of water passing through per time unit) in each pipe
+for all times t. We can transform it into a volume by multiplying it
+with the time unit. In this way we deﬁne the following quantity:
+
+Algorithm 1 Block coordinate ascent for problem (15).
+
+φˆ 0 ← ρ0 , φτ ← 1
+for t = τ − 1 : −1 : 0 do
+φt ← At (ut+1  φt+1 )
+end for
+while constraint violation (4b)-(4e) > tolerance do
+update u0 := ρ0  (φ0  φˆ 0 )
+for t = 1 : τ do
+φˆt ← (At−1 )T (φˆt−1  ut−1 )
+update uˆt := ρt  B(φt  φˆt )
+ut ← BT uˆt + 1C
+end for
+for t = τ − 1 : −1 : 0 do
+φt ← At (ut+1  φt+1 )
+end for
+end while
+
+Proof. We solve (15) by block coordinate ascent. The unconstrained objective function is maximized iteratively with respect to
+each of the variables λ0 , . . . , λτ . Similarly to Haasler et al. [12] introduce the following deﬁnitions:
+
+Si (t ) :=
+
+Fi (t ) t
+.
+Vi
+
+(22)
+
+This quantity can be interpreted as the speed of water expressed in
+pipe units: if a pipe has Si (t ) = 1 it means that in the time interval
+(t , t + t ), the water that at time t is at the beginning of the pipe
+will reach exactly the end of the pipe. Using the speeds Si (t ) we
+can compute the transition matrix At as speciﬁed in the following
+proposition.
+
+(18)
+
+ = ρ and φ = 1 we get the recursive
+for t = 0, . . . , τ . By setting φ
+τ
+0
+0
+expressions:
+
+φt = At (ut+1  φt+1 ), t = 0, . . . , τ − 1,
+ = (At−1 )T (u
+
+φ
+t = 1, . . . , τ .
+t
+t−1  φt−1 ),
+
+t = 0, . . . , τ − 1,
+
+ u .
+(Mτ −1 )T 1 = φτ  φ
+τ
+τ
+
+where u0 := exp(λ0 ) and ut := exp(BT λt ), for t = 1, . . . , τ . Using
+these relations we can replace the term exp(ν1 ) = w1 and write
+the objective (5a) only as a function of λt , t = 0, . . . , τ . 
+
+ := (At−1 )T diag(u ) . . . (A0 )T diag(u )ρ ,
+φ
+t
+t−1
+0
+0
+φt := At diag(ut+1 ) . . . diag(uτ −1 )Aτ −1 diag(uτ ),
+
+(20)
+
+But = B exp(BT λt ) = exp(λt ).
+
+Proposition 3. Consider the sequence of pipes I = {1, . . . , n} with
+corresponding speed of water {S1 , . . . , Sn } (in pipe units), and assume
+
+(19)
+4
+
+M. Mascherpa, I. Haasler, B. Ahlgren et al.
+
+European Journal of Control 74 (2023) 100846
+
+n
+−1
+that
+k=2 Sk > 1. The proportion of water from pipe 1 that moves
+to pipe k is given by
+
+⎧
+( 1 − α )S1 /Sk
+⎪
+⎪
+⎨S1 /Sk
+a1k = β S1 /Sk
+⎪
+⎪
+⎩1
+0
+
+if k = n1 < n2
+if n1 < k < n2
+if k = n2 , n1 < n2
+if k = n1 = n2
+otherwise
+
+(23)
+
+Fig. 1. A water network without bifurcation at two consecutive time steps. Water
+is ﬂowing from a reservoir (blue square), to the demand node (red circle). In light
+blue we highlight the water in pipe 1 that transition according to the ﬂow. (For
+interpretation of the references to colour in this ﬁgure legend, the reader is referred
+to the web version of this article.)
+
+where the parameters n1 , n2 ∈ N and α , β ∈ [0, 1 ) are uniquely speciﬁed by the equations
+n1 −1
+k=1
+n2 −1
+k=2
+
+1
+α
++
+= 1,
+Sk
+Sn1
+
+(24a)
+
+1
+β
++
+= 1.
+Sk
+Sn2
+
+(24b)
+
+
+Note that if n1 < n2 the water goes to more than one pipe and
+we need to use the ﬁrst three cases in (23), while if n1 = n2 all
+the water goes to one pipe as speciﬁed by the forth case. Also,
+if Sn < 1, the water from pipe 1 cannot reach beyond pipe n in
+one time step, thus may be used as an absorbing state. Next, the
+Eq. (24a) can be solved simply by setting n1 such that
+n1 −1
+
+Sk−1 ≤ 1 <
+
+k=1
+
+n1
+
+
+
+Sk−1 ,
+
+thus α = Sn1 1 −
+
+k=1
+
+n1 −1
+
+
+
+Sk−1
+
+Fig. 2. A water network with bifurcations. Water is ﬂowing from a reservoir (blue
+square), to the demand nodes (red circles). Water in pipe 1, after a time step ﬂows
+to the rest of the network according to the coloured segments. At each splitting,
+the proportion of water that moves to each branch is indicated by the arrows. (For
+interpretation of the references to colour in this ﬁgure legend, the reader is referred
+to the web version of this article.)
+
+,
+
+k=1
+
+n−1
+and similarly for (24b). Here we use the notation
+x = 0,
+k=n k
+which means that the sum in (24a) is empty if n1 = 1. Finally, note
+that by representing the ﬂow in terms of speeds sk , this proposition holds also if there is inﬂow of water into the system. Inﬂow
+changes the ﬂow in the pipes, but this is represented by changes
+in the water speed, and as seen in the proof below, (23) still holds.
+Proof. First note that the parameters n1 , n2 , α , β in (24) are
+
+−1
+uniquely determined since N
+k=2 Sk > 1. This means that the water at the beginning of pipe 1 has reached a location in pipe n1
+corresponding to proportion α , and the water from the end of pipe
+1 has reached a location in pipe n2 corresponding to proportion β ,
+and thus all water is distributed between those two points. Also
+note that the amount of water from pipe 1 that is in pipe k with
+n1 < k < n2 is inverse proportional to the speed Sk . This can be
+seen by noting that the proportion of water in pipe k that originated from pipe 1 is Fk /F1 , i.e., the quotient between the ﬂows
+represent how much the water has been diluted by other incoming ﬂows. Therefore, the amount of water in pipe k that originates
+from pipe 1 is Vk Fk /F1 and by using (22) we get that a1k = S1 /Sk .
+For pipes n1 and n2 the same reasoning holds except that the water only enters a proportion of the pipe corresponding to (1 − α )
+and β , respectively. Finally, if k = n1 = n2 then all the water from
+pipe 1 goes to pipe k, thus a1k = (β − α )S1 /Sk = 1. This can also
+be seen from the Eq. (24), and by subtracting (24a) from (24b) and
+multiplying with S1 , we obtain
+
+( 1 − α )S1
+Sn1
+
+n2 −1
+
++
+k=n1 +1
+
+S1
+β S1
++
+= 1.
+Sk
+Sn2
+
+Fig. 3. Network and sensors.
+
+of water in pipe 1, which is highlighted in light blue, in two consecutive time steps. We observe how the water from the ﬁrst pipe
+ﬁlls pipes 3,4 and part of 2 and 5. Therefore we have that n1 = 2,
+n2 = 5, while α = 34 and β = 12 indicate the fraction of the corresponding pipes where the water from pipe 1 starts and ends.
+4.2. General case
+
+(25)
+In the case of splittings in the network, we consider all the
+paths a water particle can take in the network. This gives rise to
+a set of subproblems of the form described in Section 4.1, each
+of which is solved as described therein. Moreover, each path, i.e.,
+each subproblem, is associated with a probability of a random water particle to take this path. The transition probability matrices At
+for each transition in the network are then found as a weighted
+sum of the solutions to the subproblems with the paths probabilities as weights.
+
+This represents the distribution of the water from pipe 1 into
+the pipes n1 , n1 + 1, . . . , n2 , and corresponds to the transitions in
+Eq. (23). 
+In order to explain the procedure used in Proposition 3 we can
+look at the example in Fig. 1. Here we consider a simple line network composed of 5 pipes, whose speeds of water in pipe units
+Si correspond respectively to 43 , 3, 4, 4, 3. We study the transition
+5
+
+M. Mascherpa, I. Haasler, B. Ahlgren et al.
+
+European Journal of Control 74 (2023) 100846
+
+Fig. 4. Spread of pollution over a water network according to EPANET generated data (left), Markov propagation (center), Schrödinger bridge problem with sensor observation
+(right).
+
+6
+
+M. Mascherpa, I. Haasler, B. Ahlgren et al.
+
+European Journal of Control 74 (2023) 100846
+
+An example of this procedure is given in Fig. 2. Here we consider the transition of water in pipe 1 to the rest of the network at
+two consecutive time steps. This problem can be divided in three
+subproblems of the form introduced in Section 4.1. Each subproblem is indicated with a different colour. In violet we indicate the
+path formed by pipes {1,2,3,4}, which accounts for 12 of the water.
+In pink we show the path {1,5,6}, whose weight is 16 . In light blue
+we show the subproblem {1,5,7,8}, that has weight 31 . The transition probabilities a1k are then obtained as a weighted sum of the
+transition probabilities of each path.
+
+References
+[1] J.-D. Benamou, G. Carlier, M. Cuturi, L. Nenna, G. Peyré, Iterative Bregman projections for regularized transportation problems, SIAM J. Sci. Comput. 37 (2)
+(2015) A1111–A1138.
+[2] E.Z. Berglund, J.E. Pesantez, A. Rasekh, M.E. Shaﬁee, L. Sela, T. Haxton, Review
+of modeling methodologies for managing water distribution security, J. Water
+Resour. Plan. Manag. 146 (8) (2020) 03120 0 01.
+[3] D.P. Bertsekas, Nonlinear Programming, Athena Scientiﬁc, 1999.
+[4] F.Y. Bois, T. Fahmy, J.-C. Block, D. Gatel, Dynamic modeling of bacteria in
+a pilot drinking-water distribution system, Water Res. 31 (12) (1997) 3146–
+3156.
+[5] C. Chen, W. Liu, C.-H. Lin, Q. Chen, A Markov chain model for predicting transient particle transport in enclosed environments, Build. Environ. 90 (2015)
+30–36.
+[6] R.M. Clark, E.E. Geldreich, K.R. Fox, E.W. Rice, C.H. Johnson, J.A. Goodrich,
+J.A. Barnick, F. Abdesaken, Tracking a salmonella serovar typhimurium
+outbreak in Gideon, Missouri: role of contaminant propagation modelling, AQUA-London Oxford - J. Int. Water Supply Assoc. 45 (1996) 171–
+183.
+[7] N.R. Council, et al., Drinking Water Distribution Systems: Assessing and Reducing risks, National Academies Press, 2007.
+[8] C.D. Cristo, A. Leopardi, Pollution source identiﬁcation of accidental contamination in water distribution networks, J. Water Resour. Plan. Manag. 134 (2)
+(2008) 197.
+[9] M. Cuturi, Sinkhorn distances: lightspeed computation of optimal transport,
+Adv. Neural Inf. Process. Syst. 26 (2013) 2292–2300.
+[10] I. Haasler, J. Karlsson, A. Ringh, Control and estimation of ensembles via
+structured optimal transport, IEEE Control Syst. Mag. 41 (4) (2021a) 50–
+69.
+[11] I. Haasler, A. Ringh, Y. Chen, J. Karlsson, Estimating ensemble ﬂows on a hidden Markov chain, in: 2019 IEEE 58th Conference on Decision and Control
+(CDC), IEEE, 2019, pp. 1331–1338.
+[12] I. Haasler, A. Ringh, Y. Chen, J. Karlsson, Multimarginal optimal transport with
+a tree-structured cost and the Schrödinger bridge problem, SIAM J. Control Optim. 59 (4) (2021b) 2428–2453.
+[13] J. Hall, A.D. Zaﬃro, R.B. Marx, P.C. Kefauver, E.R. Krishnan, R.C. Haught, J.G. Herrmann, On–line water quality parameters as indicators of distribution system contamination, Journal-American Water Works Assoc. 99 (1) (2007) 66–
+77.
+[14] C. Hu, M. Li, D. Zeng, S. Guo, A survey on sensor placement for contamination detection in water distribution systems, Wirel. Netw. 24 (2) (2018) 647–
+661.
+[15] R. Janke, M.E. Tryby, R.M. Clark, Protecting water supply critical infrastructure: an overview, Secur. Water Wastewater Syst. (2014) 29–85, doi:10.1007/
+978- 3- 319- 01092- 2_2.
+[16] P. Kergus, S. Formentin, M. Giuliani, A. Castelletti, Learning-based hierarchical
+control of water reservoir systems, IFAC Journal of Systems and Control. Elsevier 19 (2022) 100185.
+[17] C.D. Laird, L.T. Biegler, B.G. van Bloemen Waanders, R.A. Bartlett, Contamination source determination for water networks, J. Water Resour. Plan. Manag.
+131 (2) (2005) 125–134.
+[18] T.P. Lambrou, C.C. Anastasiou, C.G. Panayiotou, M.M. Polycarpou, A low–
+cost sensor network for real-time monitoring and contamination detection
+in drinking water distribution systems, IEEE Sens. J. 14 (8) (2014) 2765–
+2772.
+[19] C. Léonard, A survey of the Schrödinger problem and some of its connections
+with optimal transport, arXiv preprint arXiv:1308.0215 (2013).
+[20] L. Lindström, S. Gracy, S. Magnússon, H. Sandberg, Leakage localization in water distribution networks: a model-based approach, in: 2022 European Control
+Conference, IEEE, 2022, pp. 1515–1520.
+[21] S. Liu, H. Che, K. Smith, L. Chen, Contamination event detection using multiple
+types of conventional water quality sensors in source water, Environ. Sci. 16
+(8) (2014) 2028–2038.
+[22] L. Ning, F.P. Carli, A.M. Ebtehaj, E. Foufoula-Georgiou, T.T. Georgiou, Coping
+with model error in variational data assimilation using optimal mass transport, Water Resour. Res. 50 (7) (2014) 5817–5830.
+[23] W.H. Organization, Guidelines for drinking-water quality: fourth edition incorporating the ﬁrst addendum. Geneva: World Health Organization; 2017. Licence: CC BY-NC-SA 3.0 IGO.
+[24] F. Pasqualetti, F. Dorﬂer, F. Bullo, Control-theoretic methods for cyberphysical
+security: geometric principles for optimal cross-layer resilient control systems,
+IEEE Control Syst. Mag. 35 (1) (2015) 110–127.
+[25] M. Pavon, F. Ticozzi, Discrete-time classical and quantum Markovian evolutions: maximum entropy problems on path space, J. Math. Phys. 51 (4) (2010)
+042104.
+[26] M. Pavon, G. Trigila, E.G. Tabak, The data-driven Schrödinger bridge, Commun.
+Pure Appl. Math. 74 (7) (2021) 1545–1573.
+[27] S.K. Priya, G. Shenbagalakshmi, T. Revathi, Design of smart sensors for real
+time drinking water quality monitoring and contamination detection in water
+distributed mains, Int. J. Eng. Technol. 7 (1.1) (2018) 47–51.
+[28] L.A. Rossman, et al., Epanet 2: users manual (20 0 0).
+[29] C.P. Schade, N. Wright, R. Gupta, D.A. Latif, A. Jha, J. Robinson, Self-reported household impacts of large-scale chemical contamination of the
+public water supply, Charleston, West Virginia, USA, PLoS One 10 (5) (2015)
+e0126744.
+
+5. Simulations
+In this example we consider the problem of tracking the spread
+of pollution over a water network given the measurements from a
+set of sensors. In order to generate data, we use the water distribution system modelling software EPANET [28], developed by the
+US Environmental Protection Agency’s Water Supply and Water Resources Division. We introduce an adapted version of the EPANET
+net1 example, illustrated in Fig. 3. This model contains 65 states,
+corresponding to the pipes, and 8 sensors, positioned as in the ﬁgure. The ﬂow is time varying, and water can leave the network in
+every node, according to a demand pattern. The transition probabilities atik are obtained using the method introduced in Section 4,
+based on the water ﬂow from EPANET. We simulate the injection
+of pollution in a single pipe, as indicated in Fig. 3, during the ﬁrst
+time step. We use the water quality analysis feature of EPANET
+to generate our reference data; decay or growth of the pollutant
+due to bulk or wall reactions are not considered. In Fig. 4 we propose a comparison ﬁrstly with a pure Markov model, i.e. assuming
+that the pollution propagates as μt+1 = At μt ; then we compare it
+with the estimate obtained by implementing the algorithm proposed in Proposition 2, exploiting the sensor observations. We run
+the algorithm until the violation of the primal constraints (4b)–
+(4e) is smaller that a tolerance (relative error with respect to the
+total amount of pollution in the system is smaller than 10−5 ). From
+Fig. 4 we can observe how the Markov propagation results in a
+wider spread of pollution in the network, compared to the data
+generated by EPANET, in which pollution is more concentrated in a
+limited number of pipes. This behaviour is partly recovered in the
+estimate obtained with the methodology presented in Section 3:
+we can observe how the sensors measurements reduce the number
+of pipes containing pollution, obtaining a spread closer to the data.
+6. Conclusions and further directions
+In this work we have introduced a hidden Markov model framework for estimating the spread of pollution in a water network
+based on sparse sensor measurements. The proposed optimization
+problem is an extension of the Schrödinger bridge problem to the
+setting with partial observations. Building on this connection we
+derive an eﬃcient algorithm for solving the problem.
+In future work we aim to extend the method to also estimate
+the sources and amount of pollution, by relaxing the assumption
+that the initial distribution of pollution is known [8,17]. Bacterial
+contamination could be modelled more realistically by including
+dynamics for the bacteria growth into the model [4]. Moreover, we
+plan to investigate the problem of sensor placement [14]. Another
+open question is to quantify the robustness of the proposed framework to errors in the assumed Markov model.
+Declaration of Competing Interest
+The authors declare that they have no known competing ﬁnancial interests or personal relationships that could have appeared to
+inﬂuence the work reported in this paper.
+7
+
+M. Mascherpa, I. Haasler, B. Ahlgren et al.
+
+European Journal of Control 74 (2023) 100846
+
+[30] E. Schrödinger, Über die Umkehrung der Naturgesetze, Verlag der Akademie
+der Wissenschaften in Kommission bei Walter De Gruyter, 1931.
+[31] R. Singh, I. Haasler, Q. Zhang, J. Karlsson, Y. Chen, Inference with aggregate
+data in probabilistic graphical models: An optimal transport approach, IEEE
+Trans. Autom. Control 67 (9) (2022).
+
+[32] K. Srinivasarengan, T. Boukhobza, S. Aberkane, V. Laurain, Simultaneous detectability of process and sensor faults: application to water distribution networks, arXiv preprint arXiv:2007.09401 (2020).
+[33] M.V. Storey, B. Van der Gaag, B.P. Burns, Advances in on-line drinking water quality monitoring and early warning systems, Water Res. 45 (2) (2011)
+741–747.
+
+8
+
+

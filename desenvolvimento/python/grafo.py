@@ -38,33 +38,38 @@ no_balancos = {
 
 # Lista de adutoras: (Origem, Destino, Capacidade em l/s, Custo/Distância em km)
 conexoes = [
-    ("ETA Brasília", "Plano Piloto", 1200.0, 4.7),
-    ("ETA Brasília", "Guará", 1200.0, 11.1),
-    ("ETA Brasília", "Taguatinga", 1200.0, 16.0),
+    ("ETA Brasília", "Plano Piloto", 1200.0, 4.69),
+    ("ETA Brasília", "Guará", 1200.0, 11.10),
+    ("ETA Brasília", "Taguatinga", 1200.0, 16.01),
+    ("ETA Brasília", "Sobradinho", 1000.0, 23.48),
     
-    ("ETA Gama", "Samambaia", 320.0, 18.8),
-    ("ETA Gama", "Guará", 320.0, 20.3),
-    ("ETA Gama", "Ceilândia", 320.0, 23.9),
+    ("ETA Gama", "Samambaia", 320.0, 18.83),
+    ("ETA Gama", "Guará", 320.0, 20.26),
+    ("ETA Gama", "Ceilândia", 320.0, 23.94),
     
-    ("ETA Lago Norte", "Plano Piloto", 700.0, 5.3),
-    ("ETA Lago Norte", "Sobradinho", 700.0, 15.2),
-    ("ETA Lago Norte", "Guará", 700.0, 19.9),
+    ("ETA Lago Norte", "Plano Piloto", 700.0, 5.27),
+    ("ETA Lago Norte", "Sobradinho", 700.0, 15.15),
+    ("ETA Lago Norte", "Guará", 700.0, 19.94),
+    ("ETA Lago Norte", "Planaltina", 1000.0, 42.83),
     
-    ("ETA Paranoá", "Plano Piloto", 300.0, 8.6),
-    ("ETA Paranoá", "Sobradinho", 300.0, 17.0),
-    ("ETA Paranoá", "Guará", 300.0, 22.9),
+    ("ETA Paranoá", "Plano Piloto", 300.0, 8.55),
+    ("ETA Paranoá", "Sobradinho", 300.0, 16.97),
+    ("ETA Paranoá", "Guará", 300.0, 22.94),
     
-    ("ETA Planaltina", "Sobradinho", 60.0, 4.3),
-    ("ETA Planaltina", "Plano Piloto", 60.0, 23.8),
-    ("ETA Planaltina", "Planaltina", 60.0, 30.1),
+    ("ETA Planaltina", "Sobradinho", 60.0, 4.32),
+    ("ETA Planaltina", "Plano Piloto", 60.0, 23.77),
+    ("ETA Planaltina", "Planaltina", 1000.0, 30.14),
     
-    ("ETA Rio Descoberto", "Taguatinga", 6000.0, 6.1),
-    ("ETA Rio Descoberto", "Ceilândia", 6000.0, 13.4),
-    ("ETA Rio Descoberto", "Samambaia", 6000.0, 14.3),
+    ("ETA Rio Descoberto", "Taguatinga", 6000.0, 6.08),
+    ("ETA Rio Descoberto", "Ceilândia", 6000.0, 13.36),
+    ("ETA Rio Descoberto", "Samambaia", 6000.0, 14.25),
+    ("ETA Rio Descoberto", "Guará", 2000.0, 14.49),
+    ("ETA Rio Descoberto", "Plano Piloto", 2000.0, 26.76),
     
-    ("ETA Sobradinho", "Sobradinho", 600.0, 2.8),
-    ("ETA Sobradinho", "Plano Piloto", 600.0, 17.7),
-    ("ETA Sobradinho", "Guará", 600.0, 31.8)
+    ("ETA Sobradinho", "Sobradinho", 600.0, 2.78),
+    ("ETA Sobradinho", "Plano Piloto", 600.0, 17.68),
+    ("ETA Sobradinho", "Guará", 600.0, 31.76),
+    ("ETA Sobradinho", "Planaltina", 1000.0, 35.75)
 ]
 
 # 2. Criação do Objeto do Grafo

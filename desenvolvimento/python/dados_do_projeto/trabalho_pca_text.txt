@@ -1,0 +1,108 @@
+                                                   Departamento de
+                                                   Ciência da Computação
+
+
+
+
+                                   Marcelo Antonio Marotta
+                       Projeto de Complexidade e Análise de Algoritmos
+                                      Trabalho FINAL
+
+
+
+
+1 Enunciado
+A partir de uma área de pesquisa, selecione um ou mais artigos de sua área. O artigo deve
+contemplar um problema de forma clara que apresente uma ou mais soluções. O aluno utilizará
+pelo menos uma dessas soluções e apresentará em sala de aula, realizando uma avaliação do projeto
+e da análise do algoritmo criado pelos autores do artigo. É importante que uma instância do
+problema, junto de sua solução a partir do algoritmo seja apresentada.
+
+1.1 Projeto e Complexidade de Algoritmos
+1.1.1 [1/2]Projeto
+Verificar a presença de uma técnica para implementação de uma solução da literatura:
+  • Divide & Conquer;
+  • Graph programming;
+  • Dynamic Programming;
+  • Entre outras;
+    Os slides que estão disponíveis no moodle trazem exemplos de técnicas que podem ser avaliadas.
+Espera-se que o aluno consiga explicar a motivação, a lógica e as etapas de execução da técnica
+aplicada ao problema do artigo selecionado. Por exemplo, se foi utilizado divide-and-conquer,
+como foi modelada a divisão, a conquista e a combinação.
+
+1.1.2 [2/2]Análise de complexidade e execução
+Execute o algoritmo selecionado por meio da implementação, calcule a complexidade, compare:
+  • Tempo de execução;
+  • Complexidade do melhor caso; e
+  • Complexidade do pior caso; e
+  • Caso seja possível, o caso médio.
+   Os slides que estão disponíveis no moodle podem auxiliar a determinar como calcular a com-
+plexidade dos algoritmos em questão, senão, recomenda-se a busca pela bibliografia da disciplina.
+2 Material a ser entregue
+Relatório com no mínimo 3 páginas, contendo:
+
+  • Capa: Deve conter as seguintes informações:(i)nome do problema, e (ii) nome dos membros
+    do Grupo.
+
+  • Introdução: Descrição do problema a ser resolvido e visão geral sobre as técnicas utilizadas.
+
+  • Implementação: Descrição detalhada do desenvolvimento com diagramas ilustrativos/pseudocódigo,
+    o funcionamento das técnicas empregadas, detalhes de implementação (protótipo), instancia
+    considerada para teste, complexidade calculada dos piores e melhores casos, resultados al-
+    cançados e métricas de tempo de resposta, bem como decisões tomadas relativas aos casos e
+    detalhes e especificações que porventura estejam omissos no enunciado.
+
+  • Membros: Descrição das atividades desenvolvidas por cada membro do grupo.
+
+  • Conclusão: Comentários gerais sobre o trabalho e as principais dificuldades encontradas no
+    desenvolvimento dos algoritmos selecionados.
+
+   Código fonte com os seguintes arquivos:
+
+  • Algoritmo: Implementações do algoritmo.
+
+  • Experimento: Implementação da rotina experimental com instancia de teste e chamada para
+    execução do algoritmo decidido.
+
+    O relatório e o código fonte devem ser submetidos compactados (.zip) no Moodle. Serão aceitos
+relatórios em Jupyter.
+
+
+3 Critérios de Avaliação
+O trabalho será apresentado em sala de aula e pontuado de acordo com a implementação e os
+critérios da Tabela 1. Código com falta de legibilidade e modularização pode perder ponto conforme
+informado na Tabela 1. Erros gerais de funcionamento, lógica ou outros serão descontados como
+um todo.
+Ítem                           Quesitos                                                                                Max Pontos
+Relatório                      Documento PDF contendo todas as informações sobre o trabalho                            +2
+Código e execução              O projeto compilou e executou corretamente                                              +2
+Resultado                      Saídas corretas de acordo com as métricas pedidas                                       +3
+Conceitos de PCA               Código fonte implementados adequadamente                                                +3
+                               Pode perde pontos caso não faça:
+                               -Uso de comentários
+Legibilidade e Modularização   -Indentação do código                                                                   -10
+                               -Uso de funções inadequadas (duplicada/redundante/não atingível
+                               -Uso das declarações e implementações dos arquivos(.py, .hpp e .cpp) para o Algoritmo
+Atraso                         Perde 1 ponto para cada dia de atraso da data estabelecida (Max 5)                      -1
+Plágio                         Cópia de qualquer forma                                                                 -10
+
+                                            Tabela 1: Critérios de avaliação
+4 Ferramentas
+A implementação do trabalho será na linguagem C++ ou Python. Pode-se utilizar qualquer
+IDE/compilador para o desenvolvimento contanto que execute sem problemas no Linux. NÃO
+SERÃO ACEITOS DESENVOLVIMENTOS COM IMPORTAÇÃO DIRETA DE BI-
+BLIOTECAS EXTERNAS, POR EXEMPLO, utilizar a scikit learn com o algoritmo
+todo implementado apenas com uma chamada.
+
+
+5 Informações Importantes
+Cada grupo deverá desenvolver o trabalho e cada membro do grupo deverá conhecer e dominar
+todos os trechos de código gerados. Os grupos deverão desenvolver o projeto de maneira indepen-
+dente para não haver cópia ou compartilhamento de código. O projeto irá passar por um verificador
+automático de plágio. Os projetos detectados como plágio receberão nota zero, independente do
+grupo. Dessa forma, fica a cargo do grupo proteger o projeto contra cópias
+
+
+6 Datas
+As datas e local da entrega do trabalho estarão disponíveis a partir do Moodle da Disciplina.
+

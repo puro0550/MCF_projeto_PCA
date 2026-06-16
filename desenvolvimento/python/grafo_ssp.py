@@ -213,6 +213,31 @@ def main():
                 "cost": dist
             })
 
+    # Adutoras de Integração adicionais baseadas nas interconexões do Atlas DF
+    integracoes = [
+        ("ETA Rio Descoberto", "Guará", 2000.0),
+        ("ETA Rio Descoberto", "Plano Piloto", 2000.0),
+        ("ETA Brasília", "Sobradinho", 1000.0),
+        ("ETA Lago Norte", "Planaltina", 1000.0),
+        ("ETA Sobradinho", "Planaltina", 1000.0)
+    ]
+    for src, tgt, cap in integracoes:
+        if src in etas_parsed and tgt in ras_parsed:
+            dist = haversine(etas_parsed[src]["lat"], etas_parsed[src]["lon"], ras_parsed[tgt]["lat"], ras_parsed[tgt]["lon"])
+            # Evita duplicidade se já existir
+            if not any(e["source"] == src and e["target"] == tgt for e in edges):
+                edges.append({
+                    "source": src,
+                    "target": tgt,
+                    "capacity": cap,
+                    "cost": dist
+                })
+
+    # Ajuste de capacidade do arco local ETA Planaltina -> Planaltina para evitar gargalo artificial
+    for edge in edges:
+        if edge["source"] == "ETA Planaltina" and edge["target"] == "Planaltina":
+            edge["capacity"] = 1000.0
+
     # 4. Generate Folium Map
     # Center map on average of all coordinates
     all_lats = [n["lat"] for n in etas_parsed.values()] + [n["lat"] for n in ras_parsed.values()]
