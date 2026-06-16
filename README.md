@@ -7,7 +7,7 @@
 
 ## ⚠️ Disclaimer
 
-> **A versão escrita completa do trabalho (documento final em LaTeX/PDF) ainda não está incluída neste repositório.** Assim que a parte escrita estiver finalizada, ela será adicionada aqui. No momento, o repositório contém **todo o código-fonte**, os **dados do projeto**, a **apresentação de slides em LaTeX (Beamer)** e, principalmente, a **visualização interativa em HTML** que permite explorar a rede e os fluxos ótimos georreferenciados sobre o mapa do DF.
+> **A versão escrita completa do trabalho (documento final em LaTeX/PDF) ainda não está incluída neste repositório.** Assim que a parte escrita estiver finalizada, ela será adicionada aqui. No momento, o repositório contém **todo o código-fonte** do algoritmo de otimização, os **dados do projeto**, a **apresentação de slides em LaTeX (Beamer)** e as **visualizações (mapas estáticos e interativos)** geradas a partir dos resultados da otimização.
 
 ---
 
@@ -32,7 +32,7 @@ trabalho/
     │   ├── experiment.py           ← Experimento e geração de trace detalhado de execução
     │   ├── generate_slides_tikz.py ← Gerador automático de código TikZ para os slides
     │   ├── graph_visualization.py  ← Visualizações auxiliares do grafo
-    │   ├── mapa_grafo_ssp.html     ← 🗺️ MAPA INTERATIVO GERADO (abrir no navegador!)
+    │   ├── mapa_grafo_ssp.html     ← 🗺️ Mapa interativo gerado em HTML (resultado visual)
     │   ├── ssp_execution_trace.txt ← Log completo iteração-a-iteração do SSP
     │   ├── grafo_ssp_fluxos_tikz.txt ← Código TikZ gerado para inclusão no LaTeX
     │   ├── grafo_tikz.tex          ← Template TikZ do grafo
@@ -60,37 +60,13 @@ trabalho/
 
 ---
 
-## 🗺️ Visualização Interativa em HTML — Destaque do Projeto
+## 🧠 Algoritmo SSP — Núcleo da Solução
 
-Um dos maiores destaques deste projeto é o **mapa interativo georreferenciado** (`mapa_grafo_ssp.html`), que pode ser aberto diretamente no navegador. Ele apresenta:
+O coração deste projeto é o algoritmo de fluxo de custo mínimo **Successive Shortest Path (SSP)**, implementado de forma modularizada e estruturado conforme o livro-texto de referência: *"Network Flows: Theory, Algorithms, and Applications"* (Ahuja, Magnanti & Orlin - Figura 9.9).
 
-- **📍 Nós georreferenciados**: As 7 ETAs e 7 RAs do DF posicionadas em suas coordenadas geográficas reais, com ícones SVG customizados (gotas vermelhas para ETAs, casas azuis para RAs).
-- **🌊 Corpos d'água**: Polígonos do Lago Paranoá e demais reservatórios extraídos do portal oficial de dados georreferenciados do GeoPortal do GDF — renderizados como camadas semitransparentes sobre o mapa.
-- **🟢 Fluxos ótimos animados**: Arcos curvados com animação *marching ants* (AntPath) em verde, com largura proporcional ao fluxo otimizado — quanto maior o fluxo, mais grossa e rápida a animação.
-- **⚪ Conexões ociosas**: Adutoras com capacidade mas sem fluxo ativo exibidas em cinza tracejado.
-- **🔀 Toggle Rede Física / Solução Ótima**: Um botão flutuante permite alternar entre a visualização da rede física (todas as adutoras em azul) e a solução ótima do SSP (fluxos ativos em verde).
-- **🗺️ Múltiplas camadas de mapa base**: Três opções de base — Mapa Escuro (CARTO Dark Matter), OpenStreetMap e Mapa Claro (CARTO Positron).
-- **💡 Tooltips interativos**: Ao passar o mouse sobre qualquer nó ou arco, um painel mostra nome, balanço, capacidade, fluxo e custo.
-- **🎨 Design glassmorphism**: Legenda e HUD com efeito glassmorphism (backdrop-filter blur), tipografia premium e paleta de cores cuidadosamente curada.
+### Arquitetura e Fluxo de Execução
 
-> **Nota sobre os dados geográficos:** Os mapas e coordenadas utilizados foram extraídos de portais oficiais de dados abertos do Governo do Distrito Federal (GeoPortal/GDF), incluindo as localizações das ETAs, os limites das RAs (em UTM Zona 23S, convertidos para WGS84 por transformação elipsoidal manual) e os polígonos dos corpos d'água.
-
-**Muitas das visualizações e funcionalidades desenvolvidas neste projeto — como os mapas interativos, as múltiplas camadas de base, os toggles de rede/solução, e as animações de fluxo — tiveram que ficar de fora da apresentação de slides por limitações de tempo e formato.** O HTML é a melhor forma de apreciar o trabalho completo.
-
-### Como visualizar:
-```bash
-# Basta abrir o arquivo no navegador:
-xdg-open desenvolvimento/python/mapa_grafo_ssp.html
-# ou simplesmente dê duplo-clique no arquivo no gerenciador de arquivos.
-```
-
----
-
-## 🧠 Algoritmo SSP — Arquitetura Modularizada
-
-O algoritmo principal segue a implementação canônica do **Successive Shortest Path** conforme descrita no livro *"Network Flows: Theory, Algorithms, and Applications"* de Ahuja, Magnanti & Orlin (Figura 9.9). O código está dividido em módulos com responsabilidades claras:
-
-### Fluxo de Execução
+O código foi dividido de forma a separar os dados da instância, as funções auxiliares e a lógica principal do loop do SSP:
 
 ```
 ssp_solucao.py  (Orquestrador Principal)
@@ -117,20 +93,21 @@ ssp_solucao.py  (Orquestrador Principal)
 | Módulo | Responsabilidade |
 |--------|------------------|
 | **`grafo.py`** | Define a instância do problema: os **14 nós** (7 ETAs com injeção positiva, 7 RAs com demanda negativa) e as **26 adutoras** com capacidade e custo (distância geodésica em km). Os dados são *hardcoded* de forma didática e legível. |
-| **`tools.py`** | Implementa as **4 primitivas algorítmicas** usadas pelo SSP: (1) Bellman-Ford multi-source para potenciais iniciais π; (2) construção do grafo residual G(x) com custos reduzidos c^π; (3) Dijkstra com lista O(V²); (4) reconstrução de caminho mínimo via parent pointers. Cada função documenta sua complexidade. |
-| **`ssp_algorithm.py`** | Contém a função `successive_shortest_path()` — o **loop principal** do algoritmo. A cada iteração: constrói G(x), roda Dijkstra das fontes, encontra o sumidouro mais próximo, reconstrói o caminho, calcula o gargalo (delta), aumenta o fluxo, e atualiza os potenciais. Retorna o fluxo ótimo `x`, potenciais `π` e histórico completo de iterações. |
-| **`ssp_solucao.py`** | **Orquestrador principal.** Carrega os dados, corrige o balanço por ponto flutuante, executa o SSP, **verifica a otimalidade** (custos reduzidos não-negativos), imprime os fluxos ótimos nas adutoras com custo total, mede o tempo de execução (benchmark), e gera o grafo visual final com Matplotlib e código TikZ para o relatório LaTeX. |
+| **`tools.py`** | Implementa as **4 primitivas algorítmicas** usadas pelo SSP: (1) Bellman-Ford para potenciais iniciais π; (2) construção do grafo residual G(x) com custos reduzidos c^π; (3) Dijkstra com lista O(V²); (4) reconstrução de caminho mínimo. Cada função possui sua complexidade documentada. |
+| **`ssp_algorithm.py`** | Contém a função `successive_shortest_path()` — o **loop principal** do algoritmo. A cada iteração: constrói G(x), roda Dijkstra das fontes, encontra o sumidouro mais próximo, reconstrói o caminho, calcula o gargalo (delta), aumenta o fluxo e atualiza os potenciais. Retorna o fluxo ótimo `x`, potenciais `π` e o histórico de iterações. |
+| **`ssp_solucao.py`** | **Orquestrador principal.** Carrega os dados, corrige o balanço de ponto flutuante, executa o SSP, **verifica a otimalidade** (custos reduzidos não-negativos), imprime os fluxos ótimos nas adutoras com custo total, mede o tempo de execução (benchmark) e gera as visualizações estáticas finais (Matplotlib e TikZ). |
 
-### Outros Scripts
+### Scripts Auxiliares
 
 | Script | Descrição |
 |--------|-----------|
-| **`grafo_ssp.py`** | Processamento geográfico completo: lê CSVs, converte UTM→WGS84, conecta ETAs às 3 RAs mais próximas via Haversine, gera mapa Folium com corpos d'água. |
-| **`mapa_ssp_curvado.py`** | Versão premium do mapa: resolve o SSP, plota arcos Bézier curvados, animação AntPath para fluxos ativos, toggle rede física/solução, design HUD glassmorphism. |
-| **`grafo_visualizacao.py`** | Visualização estática bipartida com Matplotlib: fundo escuro, ETAs em cima, RAs embaixo, glow effects, arestas com espessura proporcional ao fluxo. |
-| **`generate_maps_matplotlib.py`** | Gera mapas estáticos com corpos d'água e arestas curvadas sobre coordenadas geográficas reais (Matplotlib). Produz `mapa_topologia.png` e `mapa_fluxos_otimos.png`. |
-| **`experiment.py`** | Executa o SSP com callback verboso, verifica otimalidade, e salva um trace detalhado de todas as iterações em `ssp_execution_trace.txt`. |
-| **`generate_slides_tikz.py`** | Gera automaticamente código TikZ para inclusão nos slides Beamer. |
+| **`experiment.py`** | Executa o SSP com callback verboso, verifica otimalidade e gera um log detalhado iteração-a-iteração em `ssp_execution_trace.txt`. |
+| **`generate_slides_tikz.py`** | Gera automaticamente código TikZ das soluções obtidas para inclusão direta nos slides Beamer. |
+| **`grafo_ssp.py`** | Script de modelagem geográfica base: lê os CSVs de dados de entrada, executa transformações de coordenadas UTM→WGS84 e exporta um mapa básico em HTML. |
+| **`mapa_ssp_curvado.py`** | Executa a otimização e gera a visualização dinâmica interativa com arcos curvados e animações de fluxo em mapa HTML. |
+| **`grafo_visualizacao.py`** | Plota o grafo em layout bipartido estático (Matplotlib) com tema escuro. |
+| **`generate_maps_matplotlib.py`** | Gera os mapas georreferenciados estáticos `mapa_topologia.png` e `mapa_fluxos_otimos.png` (Matplotlib) utilizados na apresentação de slides. |
+| **`graph_visualization.py`** | Utilitários de desenho auxiliares do grafo. |
 
 ---
 
@@ -138,73 +115,56 @@ ssp_solucao.py  (Orquestrador Principal)
 
 ### Pré-requisitos
 - Python 3.8+
-- Bibliotecas: `networkx`, `matplotlib`, `folium` (com plugin `AntPath`)
+- Bibliotecas: `networkx`, `matplotlib`, `folium` (com plugin `AntPath` para a visualização animada)
 
-> **Nota:** Todos os scripts possuem **auto-bootstrap** — ao serem chamados com o interpretador global, eles detectam e utilizam automaticamente o ambiente virtual local (`venv/`).
+> **Nota:** Todos os scripts possuem **auto-bootstrap** — ao serem executados no terminal, detectam e ativam automaticamente o ambiente virtual local (`venv/`), se configurado.
 
-### Execução do algoritmo principal
-
+### Execução do algoritmo de otimização
+Para rodar a otimização principal SSP, verificar condições de otimalidade e gerar saídas de console e gráficas:
 ```bash
 cd desenvolvimento/python/
-
-# Executa o SSP, imprime os resultados, gera gráfico e código TikZ
 python3 ssp_solucao.py
 ```
 
-**O que acontece ao rodar `ssp_solucao.py`:**
-
-1. **Carrega** os dados de `grafo.py` (14 nós, 26 arcos)
-2. **Balanceia** o grafo (correção de ponto flutuante)
-3. **Executa** o SSP modularizado (`ssp_algorithm.py` + `tools.py`)
-4. **Imprime** cada iteração com: fonte, destino, caminho mínimo, gargalo
-5. **Verifica** a otimalidade via custos reduzidos c^π ≥ 0
-6. **Imprime** os fluxos finais em todas as adutoras com custo total
-7. **Mede** o tempo de execução (benchmark em ms)
-8. **Gera** o gráfico visual `grafo_ssp_fluxos.png` (NetworkX + Matplotlib)
-9. **Exporta** código TikZ para `grafo_ssp_fluxos_tikz.txt`
-
-### Geração do mapa interativo HTML
-
+### Execução de outros experimentos e logs
 ```bash
-# Versão premium com arcos curvados e animação (recomendado):
-python3 mapa_ssp_curvado.py
-
-# Versão base com linhas retas:
-python3 grafo_ssp.py
-```
-
-### Geração de visualizações estáticas
-
-```bash
-# Grafo bipartido com dark theme (com ou sem fluxos):
-python3 grafo_visualizacao.py           # Topologia base
-python3 grafo_visualizacao.py --fluxo   # Com fluxos SSP ótimos
-
-# Mapas georreferenciados estáticos (com corpos d'água):
-python3 generate_maps_matplotlib.py
-
-# Grafo circular simplificado:
-python3 grafo.py
-```
-
-### Experimento e trace de execução
-
-```bash
-# Roda o SSP com verbose e salva trace iteração-a-iteração:
+# Executa e gera o log detalhado iteração-a-iteração
 python3 experiment.py
-# Saída em: ssp_execution_trace.txt
 ```
 
 ---
 
-## 📊 Resultados
+## 📊 Resultados e Visualizações
 
-A rede modelada é composta por:
-- **7 ETAs** (fontes) com injeção total de **+7.600 l/s**
+A rede de distribuição modelada é composta por:
+- **7 ETAs** (fontes) com capacidade de fornecimento total de **+7.600 l/s**
 - **7 RAs** (sumidouros) com demanda total de **-7.600 l/s**
-- **26 adutoras** com capacidades variando de 60 a 6.000 l/s e custos de 2,78 a 42,83 km
+- **26 adutoras** com limites de capacidade variando de 60 a 6.000 l/s e custos lineares (distância geodésica em km)
 
-O algoritmo SSP converge em poucas iterações (< 1 ms em hardware moderno) e encontra a **solução de custo mínimo** verificada pela condição de otimalidade dos custos reduzidos.
+O algoritmo SSP converge de maneira ótima em menos de **1 ms** em hardware padrão, e os resultados podem ser analisados sob múltiplos formatos de visualização gerados:
+
+### 1. Mapa Interativo Georreferenciado (HTML)
+O arquivo `desenvolvimento/python/mapa_grafo_ssp.html` apresenta a solução sobreposta ao mapa geográfico real do Distrito Federal:
+- **📍 Nós georreferenciados**: As ETAs e RAs posicionadas geograficamente, com tooltips contendo balanço hídrico, fluxos e custos.
+- **🌊 Camada de corpos d'água**: Contorno dos reservatórios do DF (como o Lago Paranoá) obtidos do GeoPortal GDF.
+- **🟢 Animações de fluxo**: Os fluxos ativos são representados por arcos curvados com animação *AntPath* (sua velocidade e espessura variam proporcionalmente à magnitude do fluxo).
+- **⚪ Elementos de HUD**: Painel de controle para alternar camadas de mapas base (Dark, OpenStreetMap, Positron) e controle visual (exibir rede física inteira ou apenas arcos com fluxos ativos).
+
+*Para visualizar:* Basta abrir o arquivo `desenvolvimento/python/mapa_grafo_ssp.html` diretamente em qualquer navegador Web ou rodar `xdg-open desenvolvimento/python/mapa_grafo_ssp.html`.
+
+### 2. Mapas Estáticos (Matplotlib)
+Os mapas `mapa_topologia.png` e `mapa_fluxos_otimos.png` localizados em `desenvolvimento/apresentacao_slides/figuras/` trazem representações geográficas estáticas de alta resolução incorporadas na apresentação de slides.
+```bash
+# Para gerar/atualizar estes mapas:
+python3 generate_maps_matplotlib.py
+```
+
+### 3. Diagrama Bipartido de Fluxos (Matplotlib)
+Um gráfico clássico de fluxo ligando as fontes no nível superior aos destinos no nível inferior com larguras de linha proporcionais aos fluxos calculados pelo SSP.
+```bash
+# Para gerar e visualizar:
+python3 grafo_visualizacao.py --fluxo
+```
 
 ---
 
