@@ -246,12 +246,14 @@ def main():
     
     m = folium.Map(location=map_center, zoom_start=11, tiles=None)
 
-    # 1. OpenStreetMap base layer
+    # 1. CartoDB Voyager base layer (OSM-styled, does not block file:// requests)
     folium.TileLayer(
-        tiles="openstreetmap",
-        name="Mapa Base (OpenStreetMap)",
+        tiles="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        name="Mapa Base (Colorido Voyager)",
         overlay=False,
-        control=True
+        control=True,
+        show=True
     ).add_to(m)
 
     # 2. Solid White base layer (SVG data URI)
@@ -260,7 +262,8 @@ def main():
         attr='Fundo Branco',
         name="Sem Mapa (Fundo Branco)",
         overlay=False,
-        control=True
+        control=True,
+        show=False
     ).add_to(m)
 
     # 3. Solid Dark base layer (SVG data URI using #2c3e50 encoded as %232c3e50)
@@ -269,7 +272,8 @@ def main():
         attr='Fundo Escuro',
         name="Sem Mapa (Fundo Escuro)",
         overlay=False,
-        control=True
+        control=True,
+        show=False
     ).add_to(m)
 
     # Add water bodies from JSON
@@ -441,8 +445,8 @@ def main():
     folium.LayerControl(position="topright").add_to(m)
 
     # Save map
-    m.save("mapa_grafo_ssp.html")
-    print("Map successfully created and saved as mapa_grafo_ssp.html")
+    m.save("mapa_grafo_ssp_basico.html")
+    print("Map successfully created and saved as mapa_grafo_ssp_basico.html")
 
     # 5. Print Tables to the Terminal
     print("\n" + "=" * 80)

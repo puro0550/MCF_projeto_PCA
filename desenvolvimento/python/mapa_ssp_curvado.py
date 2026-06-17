@@ -202,15 +202,18 @@ def main():
         attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
         name="Mapa Escuro Minimalista (Recomendado)",
         overlay=False,
-        control=True
+        control=True,
+        show=True
     ).add_to(m)
 
-    # Base layer 2: OpenStreetMap
+    # Base layer 2: CartoDB Voyager (OSM-styled, does not block file:// requests)
     folium.TileLayer(
-        tiles="openstreetmap",
-        name="Mapa Satélite / Terreno (OpenStreetMap)",
+        tiles="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png",
+        attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        name="Mapa Colorido (Voyager)",
         overlay=False,
-        control=True
+        control=True,
+        show=False
     ).add_to(m)
 
     # Base layer 3: Light Minimalist
@@ -219,7 +222,8 @@ def main():
         attr='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
         name="Mapa Claro Minimalista",
         overlay=False,
-        control=True
+        control=True,
+        show=False
     ).add_to(m)
 
     # Define Feature Groups
@@ -499,10 +503,11 @@ def main():
     m.get_root().html.add_child(folium.Element(legend_html))
     m.get_root().html.add_child(folium.Element(title_html))
 
-    # Retrieve Javascript variable names for Leaflet FeatureGroups
+    # Retrieve Javascript variable names for Leaflet FeatureGroups and map instance
     active_group_var = active_group.get_name()
     inactive_group_var = inactive_group.get_name()
     physical_group_var = physical_group.get_name()
+    map_var = m.get_name()
 
     # Create and add the floating toggle switch
     toggle_html = f"""
@@ -568,31 +573,27 @@ def main():
 
     <script>
     document.addEventListener("DOMContentLoaded", function() {{
-        setTimeout(function() {{
-            var mapElement = document.querySelector('.folium-map');
-            var mapInstance = window[mapElement.id];
-            
-            var activeGroup = window['{active_group_var}'];
-            var inactiveGroup = window['{inactive_group_var}'];
-            var physicalGroup = window['{physical_group_var}'];
-            
-            var checkbox = document.getElementById('solution-checkbox');
-            
-            function updateLayers() {{
-                if (checkbox.checked) {{
-                    if (!mapInstance.hasLayer(activeGroup)) mapInstance.addLayer(activeGroup);
-                    if (!mapInstance.hasLayer(inactiveGroup)) mapInstance.addLayer(inactiveGroup);
-                    if (mapInstance.hasLayer(physicalGroup)) mapInstance.removeLayer(physicalGroup);
-                }} else {{
-                    if (mapInstance.hasLayer(activeGroup)) mapInstance.removeLayer(activeGroup);
-                    if (mapInstance.hasLayer(inactiveGroup)) mapInstance.removeLayer(inactiveGroup);
-                    if (!mapInstance.hasLayer(physicalGroup)) mapInstance.addLayer(physicalGroup);
-                }}
+        var mapInstance = {map_var};
+        var activeGroup = {active_group_var};
+        var inactiveGroup = {inactive_group_var};
+        var physicalGroup = {physical_group_var};
+        
+        var checkbox = document.getElementById('solution-checkbox');
+        
+        function updateLayers() {{
+            if (checkbox.checked) {{
+                if (!mapInstance.hasLayer(activeGroup)) mapInstance.addLayer(activeGroup);
+                if (!mapInstance.hasLayer(inactiveGroup)) mapInstance.addLayer(inactiveGroup);
+                if (mapInstance.hasLayer(physicalGroup)) mapInstance.removeLayer(physicalGroup);
+            }} else {{
+                if (mapInstance.hasLayer(activeGroup)) mapInstance.removeLayer(activeGroup);
+                if (mapInstance.hasLayer(inactiveGroup)) mapInstance.removeLayer(inactiveGroup);
+                if (!mapInstance.hasLayer(physicalGroup)) mapInstance.addLayer(physicalGroup);
             }}
-            
-            checkbox.addEventListener('change', updateLayers);
-            updateLayers();
-        }}, 1000);
+        }}
+        
+        checkbox.addEventListener('change', updateLayers);
+        updateLayers();
     }});
     </script>
     """
