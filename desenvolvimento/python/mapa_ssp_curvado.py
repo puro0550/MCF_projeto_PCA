@@ -367,14 +367,14 @@ def main():
 
     # 6. Render nodes with custom SVG icons (Premium Look)
     eta_svg = """
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="36" height="36" style="filter: drop-shadow(0px 3px 6px rgba(239,68,68,0.45));">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%" style="filter: drop-shadow(0px 3px 6px rgba(239,68,68,0.45));">
       <path fill="#ef4444" stroke="#ffffff" stroke-width="1.8" d="M12,2.69C12,2.69 4,10 4,14A8,8 0 0,0 12,22A8,8 0 0,0 20,14C20,10 12,2.69 12,2.69Z"/>
       <circle cx="12" cy="14" r="3.5" fill="#ffffff"/>
     </svg>
     """
     
     ra_svg = """
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="36" height="36" style="filter: drop-shadow(0px 3px 6px rgba(59,130,246,0.45));">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%" style="filter: drop-shadow(0px 3px 6px rgba(59,130,246,0.45));">
       <rect x="2" y="2" width="20" height="20" rx="6" fill="#1e293b" opacity="0.3"/>
       <path fill="#3b82f6" stroke="#ffffff" stroke-width="1.8" d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"/>
     </svg>
@@ -412,12 +412,14 @@ def main():
         </div>
         """
 
+        size = int(36 * size_multiplier)
         folium.Marker(
             location=coords,
             icon=folium.DivIcon(
-                icon_size=(int(36 * size_multiplier), int(36 * size_multiplier)),
-                icon_anchor=(int(18 * size_multiplier), int(36 * size_multiplier)),
-                html=f'<div style="width:100%; height:100%; transform: scale({size_multiplier}); transform-origin: bottom center;">{icon_markup}</div>'
+                icon_size=(size, size),
+                icon_anchor=(size // 2, size // 2),
+                class_name="",
+                html=f'<div style="width:100%; height:100%;">{icon_markup}</div>'
             ),
             tooltip=tooltip_html
         ).add_to(m)

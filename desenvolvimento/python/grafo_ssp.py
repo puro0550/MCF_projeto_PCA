@@ -344,7 +344,7 @@ def main():
 
     # SVG markup for ETAs
     eta_svg = """
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%">
       <path fill="#e74c3c" stroke="#ffffff" stroke-width="1.5" d="M12,2.69C12,2.69 4,10 4,14A8,8 0 0,0 12,22A8,8 0 0,0 20,14C20,10 12,2.69 12,2.69Z"/>
       <circle cx="12" cy="14" r="3" fill="#ffffff" opacity="0.8"/>
     </svg>
@@ -352,7 +352,7 @@ def main():
     
     # SVG markup for RAs
     ra_svg = """
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="32" height="32">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%">
       <path fill="#2980b9" stroke="#ffffff" stroke-width="1.5" d="M10,20V14H14V20H19V12H22L12,3L2,12H5V20H10Z"/>
     </svg>
     """
@@ -371,8 +371,9 @@ def main():
             location=[eta["lat"], eta["lon"]],
             icon=folium.DivIcon(
                 icon_size=(32, 32),
-                icon_anchor=(16, 32),
-                html=f'<div style="width:32px; height:32px;">{eta_svg}</div>'
+                icon_anchor=(16, 16),
+                class_name="",
+                html=f'<div style="width:100%; height:100%;">{eta_svg}</div>'
             ),
             tooltip=tooltip_html
         ).add_to(m)
@@ -391,8 +392,9 @@ def main():
             location=[ra["lat"], ra["lon"]],
             icon=folium.DivIcon(
                 icon_size=(32, 32),
-                icon_anchor=(16, 32),
-                html=f'<div style="width:32px; height:32px;">{ra_svg}</div>'
+                icon_anchor=(16, 16),
+                class_name="",
+                html=f'<div style="width:100%; height:100%;">{ra_svg}</div>'
             ),
             tooltip=tooltip_html
         ).add_to(m)
