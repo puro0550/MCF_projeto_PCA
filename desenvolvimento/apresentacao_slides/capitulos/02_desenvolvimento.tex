@@ -199,13 +199,13 @@
     \node[node] (ETAParanoá) at (8.8, 3.5) {\textbf{ETA}\\\textbf{Par.} \\ $e = 300.0$ \\ $\pi = 0.0$};
     \node[node] (ETASobradinho) at (11.0, 3.5) {\textbf{ETA}\\\textbf{Sob.} \\ $e = 570.0$ \\ $\pi = 0.0$};
     \node[node] (ETAPlanaltina) at (13.2, 3.5) {\textbf{ETA}\\\textbf{Plan.} \\ $e = 60.0$ \\ $\pi = 0.0$};
-    \node[node] (Ceilandia) at (0.0, 0.0) {\textbf{Ceil.} \\ $e = -836.2$ \\ $\pi = 13.4$};
-    \node[node] (Samambaia) at (2.2, 0.0) {\textbf{Sam.} \\ $e = -852.7$ \\ $\pi = 14.2$};
-    \node[node] (Taguatinga) at (4.4, 0.0) {\textbf{Tag.} \\ $e = -1051.4$ \\ $\pi = 6.1$};
-    \node[node] (Guará) at (6.6, 0.0) {\textbf{Guará} \\ $e = -1068.0$ \\ $\pi = 11.1$};
-    \node[node] (PlanoPiloto) at (8.8, 0.0) {\textbf{Plano}\\\textbf{Piloto} \\ $e = -1763.4$ \\ $\pi = 4.7$};
-    \node[node] (Sobradinho) at (11.0, 0.0) {\textbf{Sobrad.} \\ $e = -1101.1$ \\ $\pi = 2.8$};
-    \node[node] (Planaltina) at (13.2, 0.0) {\textbf{Planalt.} \\ $e = -927.2$ \\ $\pi = 30.1$};
+    \node[node] (Ceilandia) at (0.0, 0.0) {\textbf{Ceil.} \\ $e = -836.2$ \\ $\pi = 3.2$};
+    \node[node] (Samambaia) at (2.2, 0.0) {\textbf{Sam.} \\ $e = -852.7$ \\ $\pi = 9.7$};
+    \node[node] (Taguatinga) at (4.4, 0.0) {\textbf{Tag.} \\ $e = -1051.4$ \\ $\pi = 7.5$};
+    \node[node] (Guará) at (6.6, 0.0) {\textbf{Guará} \\ $e = -1068.0$ \\ $\pi = 8.7$};
+    \node[node] (PlanoPiloto) at (8.8, 0.0) {\textbf{Plano}\\\textbf{Piloto} \\ $e = -1763.4$ \\ $\pi = 2.5$};
+    \node[node] (Sobradinho) at (11.0, 0.0) {\textbf{Sobrad.} \\ $e = -1101.1$ \\ $\pi = 2.2$};
+    \node[node] (Planaltina) at (13.2, 0.0) {\textbf{Planalt.} \\ $e = -927.2$ \\ $\pi = 1.6$};
     \draw[edge] (ETABrasilia) -- (PlanoPiloto);
     \draw[edge] (ETABrasilia) -- (Guará);
     \draw[edge] (ETABrasilia) -- (Taguatinga);
@@ -222,13 +222,13 @@
     \draw[edge] (ETAParanoá) -- (Guará);
     \draw[edge] (ETAPlanaltina) -- (Sobradinho);
     \draw[edge] (ETAPlanaltina) -- (PlanoPiloto);
-    \draw[edge] (ETAPlanaltina) -- (Planaltina);
+    \draw[path_edge] (ETAPlanaltina) -- (Planaltina) node[pos=0.25, edge_label, sloped] {$(3.2; 1000.0)$};
     \draw[edge] (ETARioDescoberto) -- (Taguatinga);
     \draw[edge] (ETARioDescoberto) -- (Ceilandia);
     \draw[edge] (ETARioDescoberto) -- (Samambaia);
     \draw[edge] (ETARioDescoberto) -- (Guará);
     \draw[edge] (ETARioDescoberto) -- (PlanoPiloto);
-    \draw[path_edge] (ETASobradinho) -- (Sobradinho) node[pos=0.25, edge_label, sloped] {$(5.6; 600.0)$};
+    \draw[edge] (ETASobradinho) -- (Sobradinho);
     \draw[edge] (ETASobradinho) -- (PlanoPiloto);
     \draw[edge] (ETASobradinho) -- (Guará);
     \draw[edge] (ETASobradinho) -- (Planaltina);
@@ -258,15 +258,15 @@
     \node[node] (ETALagoNorte) at (4.4, 3.5) {\textbf{ETA}\\\textbf{L.Nte} \\ $e = 700.0$ \\ $\pi = 0.0$};
     \node[node] (ETAGama) at (6.6, 3.5) {\textbf{ETA}\\\textbf{Gama} \\ $e = 320.0$ \\ $\pi = 0.0$};
     \node[node] (ETAParanoá) at (8.8, 3.5) {\textbf{ETA}\\\textbf{Par.} \\ $e = 300.0$ \\ $\pi = 0.0$};
-    \node[node] (ETASobradinho) at (11.0, 3.5) {\textbf{ETA}\\\textbf{Sob.} \\ $e = 0.0$ \\ $\pi = 0.0$};
-    \node[node] (ETAPlanaltina) at (13.2, 3.5) {\textbf{ETA}\\\textbf{Plan.} \\ $e = 60.0$ \\ $\pi = 0.0$};
-    \node[node] (Ceilandia) at (0.0, 0.0) {\textbf{Ceil.} \\ $e = -836.2$ \\ $\pi = -13.4$};
-    \node[node] (Samambaia) at (2.2, 0.0) {\textbf{Sam.} \\ $e = -852.7$ \\ $\pi = -14.2$};
-    \node[node] (Taguatinga) at (4.4, 0.0) {\textbf{Tag.} \\ $e = -1051.4$ \\ $\pi = -6.1$};
-    \node[node] (Guará) at (6.6, 0.0) {\textbf{Guará} \\ $e = -1068.0$ \\ $\pi = -11.1$};
-    \node[node] (PlanoPiloto) at (8.8, 0.0) {\textbf{Plano}\\\textbf{Piloto} \\ $e = -1763.4$ \\ $\pi = -4.7$};
-    \node[node] (Sobradinho) at (11.0, 0.0) {\textbf{Sobrad.} \\ $e = -531.1$ \\ $\pi = -2.8$};
-    \node[node] (Planaltina) at (13.2, 0.0) {\textbf{Planalt.} \\ $e = -927.2$ \\ $\pi = -30.1$};
+    \node[node] (ETASobradinho) at (11.0, 3.5) {\textbf{ETA}\\\textbf{Sob.} \\ $e = 570.0$ \\ $\pi = 0.0$};
+    \node[node] (ETAPlanaltina) at (13.2, 3.5) {\textbf{ETA}\\\textbf{Plan.} \\ $e = 0.0$ \\ $\pi = 0.0$};
+    \node[node] (Ceilandia) at (0.0, 0.0) {\textbf{Ceil.} \\ $e = -836.2$ \\ $\pi = -3.2$};
+    \node[node] (Samambaia) at (2.2, 0.0) {\textbf{Sam.} \\ $e = -852.7$ \\ $\pi = -9.7$};
+    \node[node] (Taguatinga) at (4.4, 0.0) {\textbf{Tag.} \\ $e = -1051.4$ \\ $\pi = -7.5$};
+    \node[node] (Guará) at (6.6, 0.0) {\textbf{Guará} \\ $e = -1068.0$ \\ $\pi = -8.7$};
+    \node[node] (PlanoPiloto) at (8.8, 0.0) {\textbf{Plano}\\\textbf{Piloto} \\ $e = -1763.4$ \\ $\pi = -2.5$};
+    \node[node] (Sobradinho) at (11.0, 0.0) {\textbf{Sobrad.} \\ $e = -1101.1$ \\ $\pi = -2.2$};
+    \node[node] (Planaltina) at (13.2, 0.0) {\textbf{Planalt.} \\ $e = -867.2$ \\ $\pi = -1.6$};
     \draw[edge] (ETABrasilia) -- (PlanoPiloto);
     \draw[edge] (ETABrasilia) -- (Guará);
     \draw[edge] (ETABrasilia) -- (Taguatinga);
@@ -283,14 +283,14 @@
     \draw[edge] (ETAParanoá) -- (Guará);
     \draw[edge] (ETAPlanaltina) -- (Sobradinho);
     \draw[edge] (ETAPlanaltina) -- (PlanoPiloto);
-    \draw[edge] (ETAPlanaltina) -- (Planaltina);
+    \draw[edge, bend left=12] (ETAPlanaltina) to (Planaltina);
+    \draw[back_edge, bend right=12] (Planaltina) to node[pos=0.65, edge_label, sloped] {$(0.0; 60.0)$} (ETAPlanaltina);
     \draw[edge] (ETARioDescoberto) -- (Taguatinga);
     \draw[path_edge] (ETARioDescoberto) -- (Ceilandia) node[pos=0.25, edge_label, sloped] {$(0.0; 6000.0)$};
     \draw[edge] (ETARioDescoberto) -- (Samambaia);
     \draw[edge] (ETARioDescoberto) -- (Guará);
     \draw[edge] (ETARioDescoberto) -- (PlanoPiloto);
-    \draw[edge, bend left=12] (ETASobradinho) to (Sobradinho);
-    \draw[back_edge, bend right=12] (Sobradinho) to node[pos=0.65, edge_label, sloped] {$(0.0; 570.0)$} (ETASobradinho);
+    \draw[edge] (ETASobradinho) -- (Sobradinho);
     \draw[edge] (ETASobradinho) -- (PlanoPiloto);
     \draw[edge] (ETASobradinho) -- (Guará);
     \draw[edge] (ETASobradinho) -- (Planaltina);
@@ -320,15 +320,15 @@
     \node[node] (ETALagoNorte) at (4.4, 3.5) {\textbf{ETA}\\\textbf{L.Nte} \\ $e = 700.0$ \\ $\pi = 0.0$};
     \node[node] (ETAGama) at (6.6, 3.5) {\textbf{ETA}\\\textbf{Gama} \\ $e = 320.0$ \\ $\pi = 0.0$};
     \node[node] (ETAParanoá) at (8.8, 3.5) {\textbf{ETA}\\\textbf{Par.} \\ $e = 300.0$ \\ $\pi = 0.0$};
-    \node[node] (ETASobradinho) at (11.0, 3.5) {\textbf{ETA}\\\textbf{Sob.} \\ $e = 0.0$ \\ $\pi = -1.5$};
-    \node[node] (ETAPlanaltina) at (13.2, 3.5) {\textbf{ETA}\\\textbf{Plan.} \\ $e = 60.0$ \\ $\pi = 0.0$};
-    \node[node] (Ceilandia) at (0.0, 0.0) {\textbf{Ceil.} \\ $e = 0.0$ \\ $\pi = -13.4$};
-    \node[node] (Samambaia) at (2.2, 0.0) {\textbf{Sam.} \\ $e = -852.7$ \\ $\pi = -14.2$};
-    \node[node] (Taguatinga) at (4.4, 0.0) {\textbf{Tag.} \\ $e = -1051.4$ \\ $\pi = -6.1$};
-    \node[node] (Guará) at (6.6, 0.0) {\textbf{Guará} \\ $e = -1068.0$ \\ $\pi = -11.1$};
-    \node[node] (PlanoPiloto) at (8.8, 0.0) {\textbf{Plano}\\\textbf{Piloto} \\ $e = -1763.4$ \\ $\pi = -4.7$};
-    \node[node] (Sobradinho) at (11.0, 0.0) {\textbf{Sobrad.} \\ $e = -531.1$ \\ $\pi = -4.3$};
-    \node[node] (Planaltina) at (13.2, 0.0) {\textbf{Planalt.} \\ $e = -927.2$ \\ $\pi = -30.1$};
+    \node[node] (ETASobradinho) at (11.0, 3.5) {\textbf{ETA}\\\textbf{Sob.} \\ $e = 570.0$ \\ $\pi = 0.0$};
+    \node[node] (ETAPlanaltina) at (13.2, 3.5) {\textbf{ETA}\\\textbf{Plan.} \\ $e = 0.0$ \\ $\pi = -6.7$};
+    \node[node] (Ceilandia) at (0.0, 0.0) {\textbf{Ceil.} \\ $e = 0.0$ \\ $\pi = -3.2$};
+    \node[node] (Samambaia) at (2.2, 0.0) {\textbf{Sam.} \\ $e = -852.7$ \\ $\pi = -9.7$};
+    \node[node] (Taguatinga) at (4.4, 0.0) {\textbf{Tag.} \\ $e = -1051.4$ \\ $\pi = -7.5$};
+    \node[node] (Guará) at (6.6, 0.0) {\textbf{Guará} \\ $e = -1068.0$ \\ $\pi = -8.7$};
+    \node[node] (PlanoPiloto) at (8.8, 0.0) {\textbf{Plano}\\\textbf{Piloto} \\ $e = -1763.4$ \\ $\pi = -2.5$};
+    \node[node] (Sobradinho) at (11.0, 0.0) {\textbf{Sobrad.} \\ $e = -1101.1$ \\ $\pi = -2.2$};
+    \node[node] (Planaltina) at (13.2, 0.0) {\textbf{Planalt.} \\ $e = -867.2$ \\ $\pi = -8.3$};
     \draw[edge] (ETABrasilia) -- (PlanoPiloto);
     \draw[path_edge] (ETABrasilia) -- (Guará) node[pos=0.55, edge_label, sloped] {$(0.0; 1200.0)$};
     \draw[edge] (ETABrasilia) -- (Taguatinga);
@@ -345,15 +345,15 @@
     \draw[edge] (ETAParanoá) -- (Guará);
     \draw[edge] (ETAPlanaltina) -- (Sobradinho);
     \draw[edge] (ETAPlanaltina) -- (PlanoPiloto);
-    \draw[edge] (ETAPlanaltina) -- (Planaltina);
+    \draw[edge, bend left=12] (ETAPlanaltina) to (Planaltina);
+    \draw[back_edge, bend right=12] (Planaltina) to node[pos=0.65, edge_label, sloped] {$(0.0; 60.0)$} (ETAPlanaltina);
     \draw[edge] (ETARioDescoberto) -- (Taguatinga);
     \draw[edge, bend left=12] (ETARioDescoberto) to (Ceilandia);
     \draw[back_edge, bend right=12] (Ceilandia) to node[pos=0.65, edge_label, sloped] {$(0.0; 836.2)$} (ETARioDescoberto);
     \draw[edge] (ETARioDescoberto) -- (Samambaia);
     \draw[edge] (ETARioDescoberto) -- (Guará);
     \draw[edge] (ETARioDescoberto) -- (PlanoPiloto);
-    \draw[edge, bend left=12] (ETASobradinho) to (Sobradinho);
-    \draw[back_edge, bend right=12] (Sobradinho) to node[pos=0.65, edge_label, sloped] {$(0.0; 570.0)$} (ETASobradinho);
+    \draw[edge] (ETASobradinho) -- (Sobradinho);
     \draw[edge] (ETASobradinho) -- (PlanoPiloto);
     \draw[edge] (ETASobradinho) -- (Guará);
     \draw[edge] (ETASobradinho) -- (Planaltina);
@@ -378,24 +378,21 @@
     back_edge/.style={->, >=stealth, dashed, thin, draw=red!45},
     edge_label/.style={font=\tiny, fill=white, inner sep=0.8pt, opacity=0.9, text opacity=1.0}
 ]
-    \node[node] (ETARioDescoberto) at (0.0, 3.5) {\textbf{ETA}\\\textbf{Desc.} \\ $e = 2761.1$ \\ $\pi = 0.0$};
-    \node[node] (ETABrasilia) at (2.2, 3.5) {\textbf{ETA}\\\textbf{Bras.} \\ $e = 0.0$ \\ $\pi = -3.4$};
-    \node[node] (ETALagoNorte) at (4.4, 3.5) {\textbf{ETA}\\\textbf{L.Nte} \\ $e = 0.0$ \\ $\pi = -7.1$};
+    \node[node] (ETARioDescoberto) at (0.0, 3.5) {\textbf{ETA}\\\textbf{Desc.} \\ $e = 2545.9$ \\ $\pi = 0.0$};
+    \node[node] (ETABrasilia) at (2.2, 3.5) {\textbf{ETA}\\\textbf{Bras.} \\ $e = 0.0$ \\ $\pi = -6.3$};
+    \node[node] (ETALagoNorte) at (4.4, 3.5) {\textbf{ETA}\\\textbf{L.Nte} \\ $e = 402.8$ \\ $\pi = 0.0$};
     \node[node] (ETAGama) at (6.6, 3.5) {\textbf{ETA}\\\textbf{Gama} \\ $e = 320.0$ \\ $\pi = 0.0$};
     \node[node] (ETAParanoá) at (8.8, 3.5) {\textbf{ETA}\\\textbf{Par.} \\ $e = 300.0$ \\ $\pi = 0.0$};
-    \node[node] (ETASobradinho) at (11.0, 3.5) {\textbf{ETA}\\\textbf{Sob.} \\ $e = 0.0$ \\ $\pi = -14.2$};
-    \node[node] (ETAPlanaltina) at (13.2, 3.5) {\textbf{ETA}\\\textbf{Plan.} \\ $e = 0.0$ \\ $\pi = -19.8$};
-    \node[node] (Ceilandia) at (0.0, 0.0) {\textbf{Ceil.} \\ $e = 0.0$ \\ $\pi = -13.4$};
-    \node[node] (Samambaia) at (2.2, 0.0) {\textbf{Sam.} \\ $e = 0.0$ \\ $\pi = -14.2$};
-    \node[node] (Taguatinga) at (4.4, 0.0) {\textbf{Tag.} \\ $e = -1051.4$ \\ $\pi = -6.1$};
-    \node[node] (Guará) at (6.6, 0.0) {\textbf{Guará} \\ $e = 0.0$ \\ $\pi = -14.5$};
-    \node[node] (PlanoPiloto) at (8.8, 0.0) {\textbf{Plano}\\\textbf{Piloto} \\ $e = -1631.4$ \\ $\pi = -8.1$};
-    \node[node] (Sobradinho) at (11.0, 0.0) {\textbf{Sobrad.} \\ $e = -531.1$ \\ $\pi = -17.0$};
-    \node[node] (Planaltina) at (13.2, 0.0) {\textbf{Planalt.} \\ $e = -167.2$ \\ $\pi = -49.9$};
-    \draw[edge, bend left=12] (ETABrasilia) to (PlanoPiloto);
-    \draw[back_edge, bend right=12] (PlanoPiloto) to node[pos=0.65, edge_label, sloped] {$(0.0; 132.0)$} (ETABrasilia);
-    \draw[edge, bend left=12] (ETABrasilia) to (Guará);
-    \draw[back_edge, bend right=12] (Guará) to node[pos=0.65, edge_label, sloped] {$(0.0; 1068.0)$} (ETABrasilia);
+    \node[node] (ETASobradinho) at (11.0, 3.5) {\textbf{ETA}\\\textbf{Sob.} \\ $e = 0.0$ \\ $\pi = -11.5$};
+    \node[node] (ETAPlanaltina) at (13.2, 3.5) {\textbf{ETA}\\\textbf{Plan.} \\ $e = 0.0$ \\ $\pi = -18.2$};
+    \node[node] (Ceilandia) at (0.0, 0.0) {\textbf{Ceil.} \\ $e = 0.0$ \\ $\pi = -3.2$};
+    \node[node] (Samambaia) at (2.2, 0.0) {\textbf{Sam.} \\ $e = -852.7$ \\ $\pi = -9.7$};
+    \node[node] (Taguatinga) at (4.4, 0.0) {\textbf{Tag.} \\ $e = -1051.4$ \\ $\pi = -7.5$};
+    \node[node] (Guará) at (6.6, 0.0) {\textbf{Guará} \\ $e = 0.0$ \\ $\pi = -14.9$};
+    \node[node] (PlanoPiloto) at (8.8, 0.0) {\textbf{Plano}\\\textbf{Piloto} \\ $e = -563.4$ \\ $\pi = -8.8$};
+    \node[node] (Sobradinho) at (11.0, 0.0) {\textbf{Sobrad.} \\ $e = -1101.1$ \\ $\pi = -10.7$};
+    \node[node] (Planaltina) at (13.2, 0.0) {\textbf{Planalt.} \\ $e = 0.0$ \\ $\pi = -19.8$};
+    \draw[edge] (ETABrasilia) -- (Guará);
     \draw[edge] (ETABrasilia) -- (Taguatinga);
     \draw[edge] (ETABrasilia) -- (Sobradinho);
     \draw[edge] (ETAGama) -- (Samambaia);
@@ -405,9 +402,9 @@
     \draw[edge] (ETALagoNorte) -- (Sobradinho);
     \draw[edge] (ETALagoNorte) -- (Guará);
     \draw[edge, bend left=12] (ETALagoNorte) to (Planaltina);
-    \draw[back_edge, bend right=12] (Planaltina) to node[pos=0.65, edge_label, sloped] {$(0.0; 700.0)$} (ETALagoNorte);
+    \draw[back_edge, bend right=12] (Planaltina) to node[pos=0.65, edge_label, sloped] {$(0.0; 297.2)$} (ETALagoNorte);
     \draw[edge] (ETAParanoá) -- (PlanoPiloto);
-    \draw[path_edge] (ETAParanoá) -- (Sobradinho) node[pos=0.40, edge_label, sloped] {$(0.0; 300.0)$};
+    \draw[edge] (ETAParanoá) -- (Sobradinho);
     \draw[edge] (ETAParanoá) -- (Guará);
     \draw[edge] (ETAPlanaltina) -- (Sobradinho);
     \draw[edge] (ETAPlanaltina) -- (PlanoPiloto);
@@ -416,15 +413,16 @@
     \draw[edge] (ETARioDescoberto) -- (Taguatinga);
     \draw[edge, bend left=12] (ETARioDescoberto) to (Ceilandia);
     \draw[back_edge, bend right=12] (Ceilandia) to node[pos=0.65, edge_label, sloped] {$(0.0; 836.2)$} (ETARioDescoberto);
-    \draw[edge, bend left=12] (ETARioDescoberto) to (Samambaia);
-    \draw[back_edge, bend right=12] (Samambaia) to node[pos=0.65, edge_label, sloped] {$(0.0; 852.7)$} (ETARioDescoberto);
-    \draw[edge] (ETARioDescoberto) -- (Guará);
+    \draw[path_edge] (ETARioDescoberto) -- (Samambaia) node[pos=0.40, edge_label, sloped] {$(0.0; 6000.0)$};
+    \draw[edge, bend left=12] (ETARioDescoberto) to (Guará);
+    \draw[back_edge, bend right=12] (Guará) to node[pos=0.65, edge_label, sloped] {$(0.0; 1068.0)$} (ETARioDescoberto);
     \draw[edge] (ETARioDescoberto) -- (PlanoPiloto);
-    \draw[edge, bend left=12] (ETASobradinho) to (Sobradinho);
-    \draw[path_edge, bend right=12] (Sobradinho) to node[pos=0.65, edge_label, sloped] {$(0.0; 570.0)$} (ETASobradinho);
+    \draw[edge] (ETASobradinho) -- (Sobradinho);
     \draw[edge] (ETASobradinho) -- (PlanoPiloto);
     \draw[edge] (ETASobradinho) -- (Guará);
-    \draw[path_edge] (ETASobradinho) -- (Planaltina) node[pos=0.40, edge_label, sloped] {$(0.0; 1000.0)$};
+    \draw[edge, bend left=12] (ETASobradinho) to (Planaltina);
+    \draw[back_edge, bend right=12] (Planaltina) to node[pos=0.65, edge_label, sloped] {$(0.0; 570.0)$} (ETASobradinho);
+    \draw[back_edge] (PlanoPiloto) -- (ETABrasilia) node[pos=0.25, edge_label, sloped] {$(0.0; 1200.0)$};
 \end{tikzpicture}
   }
 \end{frame}
@@ -495,20 +493,20 @@
     back_edge/.style={->, >=stealth, dashed, thin, draw=red!45},
     edge_label/.style={font=\tiny, fill=white, inner sep=0.8pt, opacity=0.9, text opacity=1.0}
 ]
-    \node[node] (ETARioDescoberto) at (0.0, 3.5) {\textbf{ETA}\\\textbf{Desc.} \\ $e = 0.0$ \\ $\pi = -4.6$};
-    \node[node] (ETABrasilia) at (2.2, 3.5) {\textbf{ETA}\\\textbf{Bras.} \\ $e = 0.0$ \\ $\pi = -26.6$};
-    \node[node] (ETALagoNorte) at (4.4, 3.5) {\textbf{ETA}\\\textbf{L.Nte} \\ $e = 0.0$ \\ $\pi = -40.3$};
+    \node[node] (ETARioDescoberto) at (0.0, 3.5) {\textbf{ETA}\\\textbf{Desc.} \\ $e = 0.0$ \\ $\pi = -5.3$};
+    \node[node] (ETABrasilia) at (2.2, 3.5) {\textbf{ETA}\\\textbf{Bras.} \\ $e = 0.0$ \\ $\pi = -22.4$};
+    \node[node] (ETALagoNorte) at (4.4, 3.5) {\textbf{ETA}\\\textbf{L.Nte} \\ $e = 0.0$ \\ $\pi = -30.4$};
     \node[node] (ETAGama) at (6.6, 3.5) {\textbf{ETA}\\\textbf{Gama} \\ $e = 0.0$ \\ $\pi = 0.0$};
-    \node[node] (ETAParanoá) at (8.8, 3.5) {\textbf{ETA}\\\textbf{Par.} \\ $e = 0.0$ \\ $\pi = -33.2$};
-    \node[node] (ETASobradinho) at (11.0, 3.5) {\textbf{ETA}\\\textbf{Sob.} \\ $e = 0.0$ \\ $\pi = -47.4$};
-    \node[node] (ETAPlanaltina) at (13.2, 3.5) {\textbf{ETA}\\\textbf{Plan.} \\ $e = 0.0$ \\ $\pi = -53.0$};
-    \node[node] (Ceilandia) at (0.0, 0.0) {\textbf{Ceil.} \\ $e = 0.0$ \\ $\pi = -17.9$};
-    \node[node] (Samambaia) at (2.2, 0.0) {\textbf{Sam.} \\ $e = 0.0$ \\ $\pi = -18.8$};
-    \node[node] (Taguatinga) at (4.4, 0.0) {\textbf{Tag.} \\ $e = 0.0$ \\ $\pi = -10.7$};
-    \node[node] (Guará) at (6.6, 0.0) {\textbf{Guará} \\ $e = 0.0$ \\ $\pi = -19.1$};
-    \node[node] (PlanoPiloto) at (8.8, 0.0) {\textbf{Plano}\\\textbf{Piloto} \\ $e = 0.0$ \\ $\pi = -31.3$};
-    \node[node] (Sobradinho) at (11.0, 0.0) {\textbf{Sobrad.} \\ $e = -0.0$ \\ $\pi = -50.1$};
-    \node[node] (Planaltina) at (13.2, 0.0) {\textbf{Planalt.} \\ $e = 0.0$ \\ $\pi = -83.1$};
+    \node[node] (ETAParanoá) at (8.8, 3.5) {\textbf{ETA}\\\textbf{Par.} \\ $e = 0.0$ \\ $\pi = -27.2$};
+    \node[node] (ETASobradinho) at (11.0, 3.5) {\textbf{ETA}\\\textbf{Sob.} \\ $e = 0.0$ \\ $\pi = -41.9$};
+    \node[node] (ETAPlanaltina) at (13.2, 3.5) {\textbf{ETA}\\\textbf{Plan.} \\ $e = 0.0$ \\ $\pi = -48.6$};
+    \node[node] (Ceilandia) at (0.0, 0.0) {\textbf{Ceil.} \\ $e = 0.0$ \\ $\pi = -8.5$};
+    \node[node] (Samambaia) at (2.2, 0.0) {\textbf{Sam.} \\ $e = 0.0$ \\ $\pi = -15.0$};
+    \node[node] (Taguatinga) at (4.4, 0.0) {\textbf{Tag.} \\ $e = 0.0$ \\ $\pi = -12.8$};
+    \node[node] (Guará) at (6.6, 0.0) {\textbf{Guará} \\ $e = 0.0$ \\ $\pi = -20.2$};
+    \node[node] (PlanoPiloto) at (8.8, 0.0) {\textbf{Plano}\\\textbf{Piloto} \\ $e = 0.0$ \\ $\pi = -24.9$};
+    \node[node] (Sobradinho) at (11.0, 0.0) {\textbf{Sobrad.} \\ $e = -0.0$ \\ $\pi = -41.1$};
+    \node[node] (Planaltina) at (13.2, 0.0) {\textbf{Planalt.} \\ $e = 0.0$ \\ $\pi = -50.2$};
     \draw[path_edge] (ETABrasilia) -- (PlanoPiloto) node[pos=0.25, edge_label, sloped] {$801.7/1200$};
     \draw[edge] (ETABrasilia) -- (Guará);
     \draw[edge] (ETABrasilia) -- (Taguatinga);
@@ -517,9 +515,9 @@
     \draw[edge] (ETAGama) -- (Guará);
     \draw[edge] (ETAGama) -- (Ceilandia);
     \draw[edge] (ETALagoNorte) -- (PlanoPiloto);
-    \draw[edge] (ETALagoNorte) -- (Sobradinho);
+    \draw[path_edge] (ETALagoNorte) -- (Sobradinho) node[pos=0.25, edge_label, sloped] {$402.8/700$};
     \draw[edge] (ETALagoNorte) -- (Guará);
-    \draw[path_edge] (ETALagoNorte) -- (Planaltina) node[pos=0.40, edge_label, sloped] {$700.0/1000$};
+    \draw[path_edge] (ETALagoNorte) -- (Planaltina) node[pos=0.40, edge_label, sloped] {$297.2/1000$};
     \draw[edge] (ETAParanoá) -- (PlanoPiloto);
     \draw[path_edge] (ETAParanoá) -- (Sobradinho) node[pos=0.40, edge_label, sloped] {$300.0/300$};
     \draw[edge] (ETAParanoá) -- (Guará);
@@ -531,18 +529,14 @@
     \draw[path_edge] (ETARioDescoberto) -- (Samambaia) node[pos=0.40, edge_label, sloped] {$532.7/6000$};
     \draw[path_edge] (ETARioDescoberto) -- (Guará) node[pos=0.25, edge_label, sloped] {$1068.0/2000$};
     \draw[path_edge] (ETARioDescoberto) -- (PlanoPiloto) node[pos=0.40, edge_label, sloped] {$961.7/2000$};
-    \draw[path_edge] (ETASobradinho) -- (Sobradinho) node[pos=0.25, edge_label, sloped] {$402.8/600$};
+    \draw[edge] (ETASobradinho) -- (Sobradinho);
     \draw[edge] (ETASobradinho) -- (PlanoPiloto);
     \draw[edge] (ETASobradinho) -- (Guará);
-    \draw[path_edge] (ETASobradinho) -- (Planaltina) node[pos=0.40, edge_label, sloped] {$167.2/1000$};
+    \draw[path_edge] (ETASobradinho) -- (Planaltina) node[pos=0.40, edge_label, sloped] {$570.0/1000$};
 \end{tikzpicture}
     }
     \caption{Visualização da Solução Ótima SSP (Adutoras Ativas em Laranja)}
   \end{figure}
-  \vspace{-0.3cm}
-  \begin{center}
-    \scriptsize \color{unbazul} \textbf{Nota}: Consulte o mapa georreferenciado interativo no arquivo \texttt{mapa\_interativo.html} para visualização sobre o relevo e Lago Paranoá.
-  \end{center}
 \end{frame}
 
 \subsection{Sensibilidade e Limitações}

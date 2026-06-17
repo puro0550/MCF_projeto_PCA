@@ -177,6 +177,21 @@ def main():
                 else:
                     print(f"Warning: Could not parse geom for RA {nome}")
 
+    # Override RA coordinates to point to their actual urban centers (avoiding rural centroids)
+    ra_urban_coords = {
+        "Plano Piloto": (-15.7801, -47.9292),
+        "Taguatinga": (-15.8330, -48.0570),
+        "Ceilândia": (-15.8200, -48.1150),
+        "Samambaia": (-15.8750, -48.0850),
+        "Guará": (-15.8180, -47.9750),
+        "Sobradinho": (-15.6530, -47.7880),
+        "Planaltina": (-15.6180, -47.6970)
+    }
+    for ra_name, coord in ra_urban_coords.items():
+        if ra_name in ras_parsed:
+            ras_parsed[ra_name]["lat"] = coord[0]
+            ras_parsed[ra_name]["lon"] = coord[1]
+
     # Verify we successfully parsed all nodes
     for name in eta_configs:
         if name not in etas_parsed:

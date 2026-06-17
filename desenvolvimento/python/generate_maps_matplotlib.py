@@ -129,6 +129,20 @@ with open(ras_csv, "r", encoding="utf-8") as f:
                 lat, lon = utm_to_latlon(avg_e, avg_n, zone=23, northern=False)
                 coords_nos[nome] = (lat, lon)
 
+# Override RA coordinates to point to their actual urban centers (avoiding rural centroids)
+ra_urban_coords = {
+    "Plano Piloto": (-15.7801, -47.9292),
+    "Taguatinga": (-15.8330, -48.0570),
+    "Ceilândia": (-15.8200, -48.1150),
+    "Samambaia": (-15.8750, -48.0850),
+    "Guará": (-15.8180, -47.9750),
+    "Sobradinho": (-15.6530, -47.7880),
+    "Planaltina": (-15.6180, -47.6970)
+}
+for ra_name, coord in ra_urban_coords.items():
+    if ra_name in coords_nos:
+        coords_nos[ra_name] = coord
+
 # Check that we have coords for all
 for node in no_balancos:
     if node not in coords_nos:
