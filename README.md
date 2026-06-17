@@ -5,9 +5,15 @@
 
 ---
 
-## ⚠️ Disclaimer
+## 📢 Status e Destaque do Projeto
 
-> **A versão escrita completa do trabalho (documento final em LaTeX/PDF) ainda não está incluída neste repositório.** Assim que a parte escrita estiver finalizada, ela será adicionada aqui. No momento, o repositório contém **todo o código-fonte** do algoritmo de otimização, os **dados do projeto**, a **apresentação de slides em LaTeX (Beamer)** e as **visualizações (mapas estáticos e interativos)** geradas a partir dos resultados da otimização.
+Este trabalho foi **apresentado e concluído com sucesso**.
+
+O **foco principal** e o real destaque do projeto residem na **modelagem matemática e na resolução algorítmica** da instância de fluxo de custo mínimo da rede de água do DF pelo algoritmo **Successive Shortest Path (SSP)**. Essa contribuição didática e teórica está consolidada no **relatório escrito** (`relatorio.pdf`) e na **apresentação de slides oficial** (`apresentacao.pdf`).
+
+Como um **recurso visual e didático complementar** (um detalhe interessante de enriquecimento visual do que foi alcançado com os resultados de otimização), o projeto conta também com mapas interativos em HTML (`mapa_grafo_ssp.html` e `mapa_grafo_ssp_basico.html`). 
+
+*(Nota: Durante a apresentação original dos slides, os mapas em HTML possuíam pendências técnicas de exibição e alinhamento que foram posteriormente corrigidas por completo — migrando a camada de mapa para o CartoDB Voyager e calibrando os marcadores DivIcon — estando agora 100% funcionais).*
 
 ---
 
@@ -18,44 +24,37 @@ trabalho/
 ├── README.md                       ← Este arquivo
 ├── .gitignore
 │
+├── template_slides_unb/            ← 🎓 Recurso extra: Template de slides Beamer/LaTeX da UnB
+│   ├── apresentacao.tex            ← Código principal do template
+│   ├── apresentacao.pdf            ← PDF compilado demonstrativo do template
+│   └── ... (estruturação preâmbulo, capítulos e elementos)
+│
 └── desenvolvimento/
-    ├── python/                     ← Código-fonte principal
-    │   ├── README.md               ← Documentação detalhada dos scripts Python
-    │   ├── grafo.py                ← Definição dos dados da instância (nós, arcos, balanços)
-    │   ├── ssp_algorithm.py        ← Implementação modularizada do algoritmo SSP
-    │   ├── tools.py                ← Ferramentas auxiliares (Bellman-Ford, Dijkstra, grafo residual)
-    │   ├── ssp_solucao.py          ← Script principal: executa o SSP, verifica e plota resultados
-    │   ├── grafo_ssp.py            ← Gerador do mapa interativo HTML (Folium) — versão base
-    │   ├── mapa_ssp_curvado.py     ← Gerador do mapa interativo premium (Bézier + AntPath animado)
-    │   ├── grafo_visualizacao.py   ← Visualização estática bipartida (dark theme, Matplotlib)
-    │   ├── generate_maps_matplotlib.py  ← Gerador de mapas georreferenciados estáticos (Matplotlib)
-    │   ├── experiment.py           ← Experimento e geração de trace detalhado de execução
-    │   ├── generate_slides_tikz.py ← Gerador automático de código TikZ para os slides
-    │   ├── graph_visualization.py  ← Visualizações auxiliares do grafo
-    │   ├── mapa_grafo_ssp.html     ← 🗺️ Mapa interativo gerado em HTML (resultado visual)
-    │   ├── ssp_execution_trace.txt ← Log completo iteração-a-iteração do SSP
-    │   ├── grafo_ssp_fluxos_tikz.txt ← Código TikZ gerado para inclusão no LaTeX
-    │   ├── grafo_tikz.tex          ← Template TikZ do grafo
-    │   ├── dados_do_projeto/       ← Bases de dados georreferenciadas (CSV + GeoJSON)
-    │   │   ├── estacoes_tratamento_agua.csv
-    │   │   ├── CONSUMO_AGUA_RA.csv
-    │   │   ├── CORPOS_DAGUA.json
-    │   │   └── ... (outros dados de apoio)
-    │   └── venv/                   ← Ambiente virtual Python (ignorado pelo git)
+    ├── escrita_relatorio/          ← 📝 Relatório final completo em LaTeX
+    │   ├── relatorio.tex           ← Arquivo LaTeX principal compilador
+    │   ├── relatorio.pdf           ← PDF final compilado e revisado
+    │   ├── capitulos/              ← Capítulos do relatório escrito
+    │   ├── preambulo/              ← Pacotes, estilos e bibliografia do LaTeX
+    │   └── referencias.bib         ← Arquivo de citações bibliográficas
     │
-    ├── apresentacao_slides/        ← Apresentação em LaTeX (Beamer)
-    │   ├── apresentacao.tex        ← Arquivo principal da apresentação
-    │   ├── apresentacao.pdf        ← PDF compilado dos slides
-    │   ├── capitulos/              ← Seções da apresentação
-    │   ├── elementos/              ← Elementos visuais (capa, etc.)
-    │   ├── preambulo/              ← Configurações e pacotes LaTeX
-    │   ├── figuras/                ← Imagens usadas nos slides (mapas gerados)
-    │   ├── paginas_png/            ← Páginas renderizadas em PNG
-    │   └── referencias.bib         ← Referências bibliográficas
+    ├── apresentacao_slides/        ← 📊 Apresentação de slides oficial em LaTeX (Beamer)
+    │   ├── apresentacao.tex        ← Código-fonte principal da apresentação
+    │   ├── apresentacao.pdf        ← PDF compilado dos slides oficiais
+    │   └── figuras/                ← Mapas e imagens geradas incluídas nos slides
     │
-    └── pdfs/                       ← Artigos e referências acadêmicas consultadas
-        ├── emd_original_paper.pdf  ← Paper original do Earth Mover's Distance
-        └── schrodinger_*.pdf/.txt  ← Papers sobre bridges de Schrödinger
+    ├── python/                     ← 🐍 Código-fonte do algoritmo e mapas
+    │   ├── README.md               ← Documentação de execução dos scripts Python
+    │   ├── grafo.py                ← Dados do grafo e topologia
+    │   ├── ssp_algorithm.py        ← Algoritmo Successive Shortest Path (SSP)
+    │   ├── tools.py                ← Funções auxiliares (Bellman-Ford, Dijkstra, etc.)
+    │   ├── ssp_solucao.py          ← Orquestrador do algoritmo principal
+    │   ├── mapa_ssp_curvado.py     ← Gerador do mapa premium (Bézier + Antpath + Toggle)
+    │   ├── grafo_ssp.py            ← Gerador do mapa plano básico
+    │   ├── mapa_grafo_ssp.html     ← 🗺️ MAPA INTERATIVO PREMIUM GERADO (abrir no navegador)
+    │   ├── mapa_grafo_ssp_basico.html ← MAPA BÁSICO GERADO (abrir no navegador)
+    │   └── dados_do_projeto/       ← Bases GIS do Distrito Federal (CSV + GeoJSON)
+    │
+    └── pdfs/                       ← Artigos acadêmicos e referências consultadas
 ```
 
 ---
