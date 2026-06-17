@@ -1,0 +1,22 @@
+%========    CONCLUSÃO    =========%
+\newpage
+
+\section{CONCLUSÃO}
+
+O presente trabalho demonstrou a aplicação do algoritmo Successive Shortest Path (SSP) ao problema de Fluxo de Custo Mínimo em uma rede hídrica simplificada do Distrito Federal. O algoritmo convergiu em 14 iterações, encontrando a alocação ótima com custo total de 129.482,24 km$\cdot$l/s, e a verificação automática de otimalidade via custos reduzidos confirmou a corretude da solução.
+
+A formulação matemática do problema e a construção do grafo residual com arcos reversos foram fundamentais para modelar o cenário, permitindo que o algoritmo revesse fluxos já estabelecidos nas iterações anteriores e garantindo a otimalidade global ao final do processo.
+
+As principais dificuldades encontradas durante o desenvolvimento foram:
+
+\begin{itemize}
+  \item \textbf{Delimitação do escopo}: a dificuldade de selecionar um tópico de transporte ótimo específico que coubesse no escopo da disciplina e no tempo pré-definido para a realização do estudo;
+  \item \textbf{Limitação de dados}: a necessidade de consolidar e realizar a modelagem matemática da rede utilizando exclusivamente dados públicos e abertos disponíveis na internet (provenientes do IPEDF, CAESB e ADASA);
+  \item \textbf{Balanceamento nodal}: a instância real apresentou pequenas inconsistências entre oferta e demanda total, exigindo um ajuste de absorção de resíduo numérico para garantir a viabilidade do fluxo;
+  \item \textbf{Precisão numérica}: operações com ponto flutuante requerem tolerâncias numéricas adequadas ($10^{-5}$) para evitar falsos positivos nas verificações de otimalidade e balanço;
+  \item \textbf{Grafo residual}: a compreensão teórica do funcionamento e do papel dinâmico do grafo residual (composto por caminhos de aumento e arcos reversos), o qual é essencial para garantir a otimalidade global.
+\end{itemize}
+
+Por fim, como limitação e sugestão de melhoria para o trabalho, uma comparação sistemática com outros métodos clássicos propostos por \textcite{ahuja1993network} para a resolução do MCF enriqueceria a análise do algoritmo. Especificamente, teriam sido valiosas as implementações comparativas com os algoritmos de Cancelamento de Ciclos (\textit{Cycle-Canceling}), Primal-Dual, Out-of-Kilter e de Relaxamento (\textit{Relaxation Algorithm}), permitindo avaliar o desempenho relativo sob diferentes topologias de rede.
+
+Como trabalho futuro, a inserção de incertezas nas demandas --- modelando-as como distribuições de probabilidade --- transformaria o problema determinístico em um Problema de Ponte de Schrödinger. Isso conectaria o modelo proposto à fronteira atual de pesquisa em transporte ótimo regularizado, em linha com o estado da arte sugerido por \textcite{mascherpa2023estimating}.

@@ -1,0 +1,231 @@
+%========    IMPLEMENTAÇÃO    =========%
+\newpage
+
+\section{IMPLEMENTAÇÃO}
+
+\subsection{Formulação Matemática}
+
+O problema de alocação hídrica no Distrito Federal foi modelado a partir da formulação matemática formal do problema de Fluxo de Custo Mínimo (MCF), conforme apresentada por \textcite{korte2012combinatorial} em sua definição clássica:
+
+\begin{center}
+\noindent\fbox{%
+\begin{minipage}{0.95\textwidth}
+  \vspace{0.2cm}
+  \textsc{\textbf{MINIMUM COST FLOW PROBLEM}} \\
+  \vspace{0.2cm}
+  
+  \textbf{Instance:} A digraph $G$, capacities $u : E(G) \to \mathbb{R}_+$, numbers $b : V(G) \to \mathbb{R}$ with $\sum_{v \in V(G)} b(v) = 0$, and weights $c : E(G) \to \mathbb{R}$. \\
+  
+  \textbf{Task:} Find a $b$-flow $f$ whose cost $c(f) := \sum_{e \in E(G)} f(e)c(e)$ is minimum (or decide that none exists).
+  \vspace{0.2cm}
+\end{minipage}%
+}
+\end{center}
+
+Em termos práticos de programação linear, essa definição formal se traduz no modelo algébrico de otimização a seguir:
+
+\begin{equation}
+  \min \sum_{(i,j) \in A} c_{ij} \, x_{ij}
+\end{equation}
+
+\noindent sujeito a:
+\begin{equation}
+  \sum_{\{j: (i,j) \in A\}} x_{ij} - \sum_{\{j: (j,i) \in A\}} x_{ji} = b_i \quad \forall \, i \in V
+\end{equation}
+\begin{equation}
+  0 \leq x_{ij} \leq u_{ij} \quad \forall \, (i,j) \in A
+\end{equation}
+
+\noindent no qual mapeamos os parâmetros físicos da rede de distribuição hídrica da seguinte forma:
+\begin{itemize}
+  \item $x_{ij}$: a vazão de água alocada na adutora $(i,j)$ (fluxo, em l/s);
+  \item $b_i$: o balanço hídrico do nó $i$ (em l/s). Um valor $b_i > 0$ indica que o nó é uma Estação de Tratamento de Água (ETA --- fonte de oferta), enquanto $b_i < 0$ indica uma Região Administrativa (RA --- sumidouro de demanda);
+  \item $u_{ij}$: a capacidade física máxima de vazão da adutora $(i,j)$ (em l/s);
+  \item $c_{ij}$: a distância geodésica em quilômetros da adutora $(i,j)$, usada como \textit{proxy} para o custo de bombeamento e transporte.
+\end{itemize}
+
+\subsection{Resolução via Successive Shortest Path (SSP)}
+
+Como discutido na obra clássica de \textcite{ahuja1993network}, que constitui a obra de referência para a implementação do algoritmo SSP desenvolvida neste trabalho, existem diversos algoritmos fundamentais para a resolução exata do problema de MCF. Um dos métodos mais basilares e intuitivos é o algoritmo \textit{Successive Shortest Path} (SSP), cuja compreensão segue diretamente o fluxo de raciocínio da otimização dual e das condições de otimalidade propostas na referida obra.
+
+\subsubsection{Condições de Otimalidade}
+
+A certificação de que uma solução viável de fluxo é ótima baseia-se nas condições de custos reduzidos. O resultado central da teoria de fluxos em redes é dado pelo Teorema \textit{Reduced Cost Optimality Conditions}, formalizado na obra de referência da seguinte maneira:
+
+\begin{theorem}[Condições de Otimalidade por Custo Reduzido]
+Uma solução viável $x^*$ é uma solução ótima do problema de fluxo de custo mínimo se, e somente se, para algum conjunto de potenciais nodais $\pi$, as seguintes condições de otimalidade por custos reduzidos forem satisfeitas:
+\begin{equation}
+  \bar{c}_{ij} \geq 0 \quad \forall \, (i,j) \text{ na rede residual } G(x^*)
+\end{equation}
+\end{theorem}
+
+O leitor interessado na demonstração matemática rigorosa e nas propriedades geométricas desse teorema pode consultar diretamente o capítulo 9 da obra de referência.
+
+\subsubsection{Dualidade, Potenciais Nodais e Grafo Residual}
+
+A interpretação dessas condições está intimamente ligada à teoria de dualidade em programação linear. Os potenciais de nó $\pi_i$ atuam como as variáveis duais associadas às restrições de conservação de fluxo em cada nó $i \in V$. Sob a ótica econômica, $\pi_i$ pode ser interpretado como o preço marginal (ou \textit{shadow price}) da mercadoria (neste caso, a água) no nó $i$.
+
+Definindo os \textbf{custos reduzidos} de cada arco no grafo residual como $\bar{c}_{ij} = c_{ij} - \pi_i + \pi_j$, a condição $\bar{c}_{ij} \geq 0$ estabelece que o custo de transportar uma unidade de fluxo entre os nós $i$ e $j$ deve ser maior ou igual à diferença de preço entre eles. Caso existisse algum arco residual com $\bar{c}_{ij} < 0$, haveria oportunidade de reduzir o custo total enviando fluxo por este caminho (relação com a inexistência de ciclos negativos).
+
+O \textbf{grafo residual} $G_x$ é a estrutura que operacionaliza esse conceito dual, representando dinamicamente as direções permitidas para alteração de fluxo:
+\begin{itemize}
+  \item \textbf{Arcos \textit{forward}}: representam a capacidade física ainda livre de adução, com capacidade residual $r_{ij} = u_{ij} - x_{ij}$ e custo reduzido $\bar{c}_{ij} = c_{ij} - \pi_i + \pi_j$;
+  \item \textbf{Arcos \textit{backward}}: possibilitam a reversão ou devolução de fluxo previamente enviado, com capacidade residual $r_{ji} = x_{ij}$ e custo reduzido $\bar{c}_{ji} = -c_{ij} - \pi_j + \pi_i$.
+\end{itemize}
+
+\subsubsection{O Algoritmo SSP e seu Pseudocódigo}
+
+O algoritmo \textit{Successive Shortest Path} tira proveito direto das condições de otimalidade. Diferente de outros métodos que mantêm a viabilidade do fluxo (conservação nos nós) e buscam a otimalidade dual (eliminação de ciclos de custo negativo), o SSP faz o caminho inverso: ele mantém a otimalidade dual (garantindo que $\bar{c}_{ij} \geq 0$ em todas as iterações) e busca a viabilidade primal de forma incremental.
+
+O algoritmo inicia com fluxo nulo e potenciais nodais calculados para satisfazer a otimalidade. A cada iteração, identifica-se nós com excesso de oferta $e(s) > 0$ e nós com déficit de demanda $e(t) < 0$. Em seguida, busca-se o caminho mais curto $P$ de $s$ a $t$ no grafo residual $G_x$. Como os custos reduzidos são sempre não-negativos, o algoritmo de Dijkstra pode ser empregado com segurança. O fluxo é então aumentado ao longo de $P$, e os potenciais nodais são atualizados com base nas distâncias calculadas, preservando as condições de otimalidade até que todos os nós atinjam o equilíbrio. O pseudocódigo estruturado do algoritmo é detalhado no algoritmo \ref{alg:ssp}.
+
+\begin{algorithm}[H]
+  \caption{Successive Shortest Path}
+  \label{alg:ssp}
+  \SetKwInOut{Input}{Entrada}\SetKwInOut{Output}{Saída}
+  \Input{Grafo $G=(V,A)$, balanços $b$, capacidades $u$, custos $c$}
+  \Output{Fluxo ótimo $x$}
+  \SetAlgoLined
+  Inicializa $x \leftarrow 0$ (fluxo nulo)\;
+  Calcula potenciais iniciais $\pi$ via Bellman-Ford\;
+  \While{existe nó $s$ com excesso $e(s) > 0$}{
+    Escolhe nó $t$ com déficit $e(t) < 0$\;
+    Encontra caminho $P$ de custo mínimo reduzido $\bar{c}$ de $s$ a $t$ em $G_x$ (Dijkstra com $\bar{c}_{ij} \geq 0$)\;
+    Atualiza potenciais $\pi_i \leftarrow \pi_i - d(i)$ para todo $i \in V$ (onde $d(i)$ é a distância de $s$ a $i$)\;
+    $\delta \leftarrow \min(e(s), -e(t), \min_{(i,j) \in P} r_{ij})$\;
+    Aumenta $\delta$ unidades de fluxo ao longo de $P$ no grafo $x$\;
+    Atualiza excessos: $e(s) \leftarrow e(s) - \delta$ e $e(t) \leftarrow e(t) + \delta$\;
+  }
+  \Return{$x$}\;
+\end{algorithm}
+
+
+\subsection{Detalhes de Implementação}
+
+A implementação foi desenvolvida em Python puro, sem dependências de solvers ou bibliotecas externas de otimização. O código é modularizado nos seguintes arquivos:
+
+\begin{itemize}
+  \item \texttt{ssp\_solucao.py}: script principal que coordena o balanceamento de ponto flutuante, carrega os dados e executa o solucionador SSP, além de gerar relatórios de saída;
+  \item \texttt{ssp\_algorithm.py}: loop principal do algoritmo SSP, estruturado para busca sucessiva de fontes de excesso e sumidouros de déficit;
+  \item \texttt{grafo.py}: definição da estrutura e dados da instância de teste (nós, balanços, adutoras, capacidades e custos) e geração de visualizações gráficas;
+  \item \texttt{tools.py}: funções auxiliares modulares contendo Bellman-Ford para potenciais iniciais, construção do grafo residual, busca de caminho mínimo via algoritmo de Dijkstra (utilizando busca linear) e reconstrução do caminho.
+\end{itemize}
+
+Principais decisões de implementação:
+
+\begin{itemize}
+  \item Dijkstra com busca linear simples (sem heap binário) para manter a implementação didática, resultando em $O(V^2)$ por iteração;
+  \item Grafo residual reconstruído a cada iteração como lista de adjacência dinâmica;
+  \item Tolerância numérica de $10^{-5}$ para comparações de fluxo;
+  \item Verificação automática de otimalidade ao final via custos reduzidos $\bar{c}_{ij} \geq 0$.
+\end{itemize}
+
+
+\subsection{Instância de Teste}
+
+A instância utilizada é uma simplificação da rede hídrica real do Distrito Federal, com dados baseados em estatísticas da CAESB e ADASA:
+
+\begin{itemize}
+  \item \textbf{Topologia}: grafo bipartido com 7 ETAs (fontes) e 7 RAs (sumidouros), interconectados por 26 adutoras;
+  \item \textbf{Injeção total}: +7.600 l/s distribuídos entre as ETAs;
+  \item \textbf{Demanda total}: --7.600 l/s distribuídos entre as RAs;
+  \item \textbf{Custos}: distância geodésica em km entre ETA e RA (calculada via fórmula de Haversine a partir de coordenadas reais).
+\end{itemize}
+
+\vspace{0.3cm}
+\begin{table}[H]
+  \centering
+  \small
+  \begin{tabular}{llr}
+    \toprule
+    \textbf{Nó} & \textbf{Tipo} & \textbf{Balanço Nodal (l/s)} \\
+    \midrule
+    ETA Rio Descoberto & Fonte & $+4450{,}00$ \\
+    ETA Brasília & Fonte & $+1200{,}00$ \\
+    ETA Lago Norte & Fonte & $+700{,}00$ \\
+    ETA Sobradinho & Fonte & $+570{,}00$ \\
+    ETA Gama & Fonte & $+320{,}00$ \\
+    ETA Paranoá & Fonte & $+300{,}00$ \\
+    ETA Planaltina & Fonte & $+60{,}00$ \\
+    \midrule
+    Plano Piloto & Sumidouro & $-1763{,}40$ \\
+    Sobradinho & Sumidouro & $-1101{,}09$ \\
+    Guará & Sumidouro & $-1067{,}97$ \\
+    Taguatinga & Sumidouro & $-1051{,}42$ \\
+    Planaltina & Sumidouro & $-927{,}23$ \\
+    Samambaia & Sumidouro & $-852{,}72$ \\
+    Ceilândia & Sumidouro & $-836{,}17$ \\
+    \bottomrule
+  \end{tabular}
+  \caption{Balanços nodais da instância hídrica do DF.}
+\end{table}
+
+
+\subsection{Análise de Complexidade}
+
+O custo computacional total do algoritmo Successive Shortest Path (SSP) é dominado pela execução inicial do algoritmo de Bellman-Ford e pelas chamadas sucessivas do algoritmo de Dijkstra para a determinação de caminhos mínimos de custo reduzido no grafo residual. A tabela \ref{tab:complexidade} detalha a complexidade de cada etapa do algoritmo.
+
+\begin{table}[H]
+  \centering
+  \footnotesize
+  \begin{tabular}{llll}
+    \toprule
+    \textbf{Etapa} & \textbf{Operação} & \textbf{Estrutura} & \textbf{Complexidade} \\
+    \midrule
+    Inicialização & Fluxos $x = 0$ & Vetor & $O(E)$ \\
+    Potenciais iniciais & Bellman-Ford multi-source & Arestas & $O(V \cdot E)$ \\
+    Busca de fontes/sumidouros & Varredura linear & Vetor & $O(V)$ \\
+    Caminho mínimo residual & Dijkstra (lista linear) & Lista/Fila & $O(V^2)$ \\
+    Atualização de potenciais & Vetor de distâncias & Vetor & $O(V)$ \\
+    Aumento de fluxo & Busca reversa (ponteiros de pai) & Caminho & $O(V)$ \\
+    \bottomrule
+  \end{tabular}
+  \caption{Complexidade por etapa do SSP.}
+  \label{tab:complexidade}
+\end{table}
+
+Analisando as etapas dominantes, temos:
+\begin{enumerate}
+  \item \textbf{Pré-processamento (Bellman-Ford)}: Utilizado uma única vez para obter os potenciais iniciais $\pi$ e garantir custos reduzidos residuais não-negativos ($\bar{c}_{ij} \geq 0$). Essa etapa consome $O(V \cdot E)$ operações.
+  \item \textbf{Loop Principal (Dijkstra)}: Em cada iteração, busca-se um caminho mínimo no grafo residual. Como o Dijkstra foi implementado utilizando uma busca linear simples para extração do nó de menor distância na fila de prioridades (sem o uso de heap binário), a complexidade por iteração é de $O(V^2)$.
+  \item \textbf{Limite Superior da Complexidade (Notação Big-O)}: O custo total de execução é limitado superiormente por $O(V \cdot E + U \cdot V^2)$, em que $U = \sum_{b_i > 0} b_i$ representa a soma dos excessos das fontes. Este limite é estabelecido para instâncias com balanços e capacidades inteiros. Para a instância real utilizada, com capacidades e demandas fracionárias, o algoritmo convergiu em apenas 14 iterações.
+\end{enumerate}
+
+
+\subsection{Resultados Obtidos}
+
+O algoritmo SSP convergiu em \textbf{14 iterações} e encontrou a solução ótima com custo total de \textbf{129.482,24 km$\cdot$l/s}. A verificação automática de otimalidade confirmou que todos os custos reduzidos no grafo residual são não-negativos. 
+
+\begin{table}[H]
+  \centering
+  \small
+  \begin{tabular}{llrr}
+    \toprule
+    \textbf{Origem} & \textbf{Destino} & \textbf{Fluxo (l/s)} & \textbf{Utilização (\%)} \\
+    \midrule
+    ETA Rio Descoberto & Ceilândia & $836{,}17$ & $13{,}9\%$ \\
+    ETA Rio Descoberto & Samambaia & $532{,}72$ & $8{,}9\%$ \\
+    ETA Rio Descoberto & Taguatinga & $1051{,}42$ & $17{,}5\%$ \\
+    ETA Rio Descoberto & Guará & $1067{,}97$ & $53{,}4\%$ \\
+    ETA Rio Descoberto & Plano Piloto & $961{,}72$ & $48{,}1\%$ \\
+    ETA Brasília & Plano Piloto & $801{,}68$ & $66{,}8\%$ \\
+    ETA Brasília & Sobradinho & $398{,}32$ & $39{,}8\%$ \\
+    ETA Gama & Samambaia & $320{,}00$ & \textbf{100{,}0\%} \\
+    ETA Lago Norte & Planaltina & $700{,}00$ & $70{,}0\%$ \\
+    ETA Paranoá & Sobradinho & $300{,}00$ & \textbf{100{,}0\%} \\
+    ETA Planaltina & Planaltina & $60{,}00$ & $6{,}0\%$ \\
+    ETA Sobradinho & Sobradinho & $402{,}77$ & $67{,}1\%$ \\
+    ETA Sobradinho & Planaltina & $167{,}23$ & $16{,}7\%$ \\
+    \bottomrule
+  \end{tabular}
+  \caption{Alocação ótima de fluxos nas adutoras.}
+\end{table}
+
+Observações sobre os resultados:
+
+\begin{itemize}
+  \item \textbf{Arcos saturados} (100\%): Gama $\rightarrow$ Samambaia e Paranoá $\rightarrow$ Sobradinho --- indicam gargalos da rede;
+  \item \textbf{Arcos ociosos}: 13 adutoras operam com fluxo zero, indicando rotas menos eficientes;
+  \item \textbf{Tempo de execução}: inferior a 1 ms para a instância de 14 nós e 26 arestas;
+  \item A iteração 8 demonstra o uso de \textbf{arcos reversos} no grafo residual (caminho: ETA Paranoá $\rightarrow$ Sobradinho $\rightarrow$ ETA Sobradinho $\rightarrow$ Planaltina), validando a capacidade do algoritmo de autocorreção.
+\end{itemize}

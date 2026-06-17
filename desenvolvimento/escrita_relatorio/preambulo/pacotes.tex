@@ -1,0 +1,46 @@
+%====== PACOTES PRINCIPAIS ======%
+\usepackage{graphicx}
+\usepackage[top=3cm,bottom=2cm,inner=3cm,outer=2cm, twoside]{geometry}
+\usepackage{ragged2e}
+\usepackage{fontspec}
+\usepackage{microtype}
+\usepackage{setspace}
+\usepackage{comment}
+\usepackage{fancyhdr}
+\usepackage{lipsum}
+\usepackage[bottom]{footmisc}
+\usepackage{pdfpages}
+\usepackage{csquotes}
+\usepackage{booktabs}
+\usepackage{changepage}
+
+%====== PACOTES PARA REFERÊNCIAS ABNT ======%
+\usepackage{babel}
+\babelprovide[import, main]{brazilian}
+\usepackage{indentfirst}
+\usepackage[bibstyle=abnt, citestyle=abnt, backend=biber, maxnames=2, minnames=1]{biblatex}
+\usepackage{etoolbox}
+\addbibresource{referencias.bib}
+
+%====== PACOTES MATEMÁTICOS E GERAIS ======%
+\usepackage{hyperref}
+\usepackage{amssymb}
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{array}
+\usepackage{unicode-math}
+\usepackage{nameref}
+\usepackage{float}
+\usepackage[table]{xcolor}
+
+%====== OUTROS ======%
+\usepackage{soul}
+\usepackage{xcolor}
+\usepackage{tikz}
+\usetikzlibrary{matrix, positioning, arrows.meta, fit, backgrounds}
+
+% Carregando depois de hyperref e babel para não sobrescrever
+\usepackage{newfloat}
+\usepackage{caption}
+\usepackage{tocloft}
+\usepackage[ruled, vlined, linesnumbered, portuguese]{algorithm2e}

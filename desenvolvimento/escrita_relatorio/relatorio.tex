@@ -1,0 +1,42 @@
+% Arquivo principal - relatorio.tex
+\documentclass[12pt, a4paper,twoside]{article}
+
+% ========== PRÉ-AMBIENTE ==========
+% Carrega todas as configurações
+ \input{preambulo/pacotes}
+ \input{preambulo/config}
+ \input{preambulo/estilo}
+
+% ========== DOCUMENTO ==========
+\begin{document}
+\justifying
+
+% Capa
+ \input{capitulos/elementos_pre_textuais/01_capa.tex}
+
+% Sumário
+ \input{capitulos/elementos_pre_textuais/11_sumario.tex}
+
+% Capítulos principais
+\input{capitulos/01_introducao}
+\input{capitulos/02_implementacao}
+\input{capitulos/05_conclusao}
+
+
+ \newpage
+ \section*{\centering \MakeUppercase{Referências}}
+ \addcontentsline{toc}{section}{REFERÊNCIAS}
+ {\doublespacing
+ \nocite{*}
+ \printbibliography[heading=none]
+ }
+
+ 
+% ----------------------------------
+% Anexo: Declaração de Uso de IA
+\newpage
+\appendix
+
+\input{capitulos/06_anexo_1}
+
+\end{document}

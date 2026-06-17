@@ -3,7 +3,9 @@ import sys
 import math
 import time
 
-# Auto-bootstrap: garante que roda no ambiente virtual (venv) com as dependências instaladas
+# Auto-bootstrap: garante que roda no ambiente virtual (venv) com as dependências instaladas se disponível.
+# Caso contrário, executa apenas a lógica do algoritmo (sem gerar gráficos PNG/TikZ).
+has_visualization = True
 try:
     import networkx as nx
     import matplotlib.pyplot as plt
@@ -11,10 +13,12 @@ except ImportError:
     script_dir = os.path.dirname(os.path.abspath(__file__))
     venv_python = os.path.join(script_dir, "venv", "bin", "python3")
     if os.path.exists(venv_python) and sys.executable != venv_python:
-        os.execv(venv_python, [venv_python] + sys.argv)
+        try:
+            os.execv(venv_python, [venv_python] + sys.argv)
+        except Exception:
+            has_visualization = False
     else:
-        print("Erro: Instale as bibliotecas necessárias: pip install networkx matplotlib")
-        sys.exit(1)
+        has_visualization = False
 
 # Importa os dados originais
 from grafo import no_balancos as orig_balancos, conexoes as orig_conexoes
@@ -123,184 +127,194 @@ print(f"\nCusto Total Otimizado da Distribuição (Fluxo x Custo): {total_cost:.
 print(f"Tempo de Execução do Algoritmo (Benchmark): {execution_time_ms:.3f} ms")
 
 # ==============================================================================
-# 3. VISUALIZAÇÃO E PLOTAGEM DO GRAFO COM FLUXOS
+# 3. VISUALIZAÇÃO E PLOTAGEM DO GRAFO COM FLUXOS (OPCIONAL)
 # ==============================================================================
 
-# Cria o grafo com NetworkX para plotagem
-G_plot = nx.DiGraph()
-for no, bal in no_balancos.items():
-    G_plot.add_node(no, balance=bal)
-for (u, v), flow in x.items():
-    cap, cost = E_edges[(u, v)]
-    G_plot.add_edge(u, v, capacity=cap, cost=cost, flow=flow)
+if has_visualization:
+    # Cria o grafo com NetworkX para plotagem
+    G_plot = nx.DiGraph()
+    for no, bal in no_balancos.items():
+        G_plot.add_node(no, balance=bal)
+    for (u, v), flow in x.items():
+        cap, cost = E_edges[(u, v)]
+        G_plot.add_edge(u, v, capacity=cap, cost=cost, flow=flow)
 
-# Posições circulares para os nós
-pos = nx.circular_layout(G_plot)
-pos_rotulos = {}
-for no, coords in pos.items():
-    x_c, y_c = coords
-    pos_rotulos[no] = (x_c * 1.25, y_c * 1.25)
+    # Posições circulares para os nós
+    pos = nx.circular_layout(G_plot)
+    pos_rotulos = {}
+    for no, coords in pos.items():
+        x_c, y_c = coords
+        pos_rotulos[no] = (x_c * 1.25, y_c * 1.25)
 
-plt.figure(figsize=(16, 14), facecolor="white")
+    plt.figure(figsize=(16, 14), facecolor="white")
 
-# Desenha os nós
-cores_nos = ["#e74c3c" if "ETA" in no else "#2980b9" for no in G_plot.nodes()]
-nx.draw_networkx_nodes(G_plot, pos, node_color=cores_nos, node_size=1100, edgecolors="white", linewidths=2.5)
+    # Desenha os nós
+    cores_nos = ["#e74c3c" if "ETA" in no else "#2980b9" for no in G_plot.nodes()]
+    nx.draw_networkx_nodes(G_plot, pos, node_color=cores_nos, node_size=1100, edgecolors="white", linewidths=2.5)
 
-# Desenha as arestas
-# Vamos desenhar as arestas com fluxos ativos em verde grosso, e as sem fluxo em cinza pontilhado
-edges_with_flow = []
-edges_no_flow = []
-widths_with_flow = []
+    # Desenha as arestas
+    # Vamos desenhar as arestas com fluxos ativos em verde grosso, e as sem fluxo em cinza pontilhado
+    edges_with_flow = []
+    edges_no_flow = []
+    widths_with_flow = []
 
-for u, v, data in G_plot.edges(data=True):
-    flow_val = data["flow"]
-    if flow_val > 1e-2:
-        edges_with_flow.append((u, v))
-        # Largura proporcional ao fluxo
-        widths_with_flow.append(1.5 + 4.5 * (flow_val / data["capacity"]))
-    else:
-        edges_no_flow.append((u, v))
+    for u, v, data in G_plot.edges(data=True):
+        flow_val = data["flow"]
+        if flow_val > 1e-2:
+            edges_with_flow.append((u, v))
+            # Largura proporcional ao fluxo
+            widths_with_flow.append(1.5 + 4.5 * (flow_val / data["capacity"]))
+        else:
+            edges_no_flow.append((u, v))
 
-# Desenha arestas com fluxo (verde sólido)
-nx.draw_networkx_edges(
-    G_plot, pos,
-    edgelist=edges_with_flow,
-    edge_color="#2ecc71",
-    width=widths_with_flow,
-    arrowsize=22,
-    arrowstyle="-|>",
-    min_source_margin=20,
-    min_target_margin=20
-)
+    # Desenha arestas com fluxo (verde sólido)
+    nx.draw_networkx_edges(
+        G_plot, pos,
+        edgelist=edges_with_flow,
+        edge_color="#2ecc71",
+        width=widths_with_flow,
+        arrowsize=22,
+        arrowstyle="-|>",
+        min_source_margin=20,
+        min_target_margin=20
+    )
 
-# Desenha arestas sem fluxo (cinza pontilhado e fino)
-nx.draw_networkx_edges(
-    G_plot, pos,
-    edgelist=edges_no_flow,
-    edge_color="#bdc3c7",
-    width=1.0,
-    style="--",
-    arrowsize=12,
-    arrowstyle="-|>",
-    min_source_margin=20,
-    min_target_margin=20
-)
+    # Desenha arestas sem fluxo (cinza pontilhado e fino)
+    nx.draw_networkx_edges(
+        G_plot, pos,
+        edgelist=edges_no_flow,
+        edge_color="#bdc3c7",
+        width=1.0,
+        style="--",
+        arrowsize=12,
+        arrowstyle="-|>",
+        min_source_margin=20,
+        min_target_margin=20
+    )
 
-# Rótulos dos nós (Nome + Balanço)
-rotulos_nos = {}
-for no, bal in no_balancos.items():
-    sinal = "+" if bal > 0 else ""
-    rotulos_nos[no] = f"{no}\n({sinal}{bal:.2f} l/s)"
+    # Rótulos dos nós (Nome + Balanço)
+    rotulos_nos = {}
+    for no, bal in no_balancos.items():
+        sinal = "+" if bal > 0 else ""
+        rotulos_nos[no] = f"{no}\n({sinal}{bal:.2f} l/s)"
 
-nx.draw_networkx_labels(
-    G_plot, pos_rotulos,
-    labels=rotulos_nos,
-    font_size=9.5,
-    font_weight="bold",
-    font_color="#2c3e50"
-)
+    nx.draw_networkx_labels(
+        G_plot, pos_rotulos,
+        labels=rotulos_nos,
+        font_size=9.5,
+        font_weight="bold",
+        font_color="#2c3e50"
+    )
 
-# Rótulos das arestas (Fluxo / Capacidade | Custo)
-rotulos_arestas = {}
-for u, v, data in G_plot.edges(data=True):
-    flow_val = data["flow"]
-    cap_val = data["capacity"]
-    cost_val = data["cost"]
-    if flow_val > 1e-2:
-        rotulos_arestas[(u, v)] = f"f: {flow_val:.1f}/{cap_val:.0f}\nd: {cost_val:.1f}"
-    else:
-        rotulos_arestas[(u, v)] = f"f: 0/{cap_val:.0f}\nd: {cost_val:.1f}"
+    # Rótulos das arestas (Fluxo / Capacidade | Custo)
+    rotulos_arestas = {}
+    for u, v, data in G_plot.edges(data=True):
+        flow_val = data["flow"]
+        cap_val = data["capacity"]
+        cost_val = data["cost"]
+        if flow_val > 1e-2:
+            rotulos_arestas[(u, v)] = f"f: {flow_val:.1f}/{cap_val:.0f}\nd: {cost_val:.1f}"
+        else:
+            rotulos_arestas[(u, v)] = f"f: 0/{cap_val:.0f}\nd: {cost_val:.1f}"
 
-nx.draw_networkx_edge_labels(
-    G_plot, pos,
-    edge_labels=rotulos_arestas,
-    font_size=8,
-    font_color="#27ae60",
-    label_pos=0.5,
-    rotate=True
-)
+    nx.draw_networkx_edge_labels(
+        G_plot, pos,
+        edge_labels=rotulos_arestas,
+        font_size=8,
+        font_color="#27ae60",
+        label_pos=0.5,
+        rotate=True
+    )
 
-plt.title(
-    f"Solução Ótima pelo Algoritmo Successive Shortest Path (SSP)\n"
-    f"Fluxo Total Otimizado = {total_flow_sent:.2f} l/s | Custo = {total_cost:.2f} km-l/s | Tempo = {execution_time_ms:.3f} ms",
-    fontsize=15,
-    fontweight="bold",
-    color="#2c3e50",
-    pad=30
-)
+    plt.title(
+        f"Solução Ótima pelo Algoritmo Successive Shortest Path (SSP)\n"
+        f"Fluxo Total Otimizado = {total_flow_sent:.2f} l/s | Custo = {total_cost:.2f} km-l/s | Tempo = {execution_time_ms:.3f} ms",
+        fontsize=15,
+        fontweight="bold",
+        color="#2c3e50",
+        pad=30
+    )
 
-plt.xlim(-1.5, 1.5)
-plt.ylim(-1.5, 1.5)
-plt.axis("off")
-plt.tight_layout()
+    plt.xlim(-1.5, 1.5)
+    plt.ylim(-1.5, 1.5)
+    plt.axis("off")
+    plt.tight_layout()
 
-# Salva a imagem final
-output_img = os.path.join(os.path.dirname(os.path.abspath(__file__)), "grafo_ssp_fluxos.png")
-plt.savefig(output_img, dpi=300, bbox_inches="tight")
-print(f"\n[Sucesso] Gráfico final de fluxos salvo em: {output_img}")
+    # Salva a imagem final
+    output_img = os.path.join(os.path.dirname(os.path.abspath(__file__)), "grafo_ssp_fluxos.png")
+    plt.savefig(output_img, dpi=300, bbox_inches="tight")
+    print(f"\n[Sucesso] Gráfico final de fluxos salvo em: {output_img}")
 
-# ==============================================================================
-# 4. GERAÇÃO DO CÓDIGO TIKZ PARA O RELATÓRIO LATEX
-# ==============================================================================
+    # ==============================================================================
+    # 4. GERAÇÃO DO CÓDIGO TIKZ PARA O RELATÓRIO LATEX
+    # ==============================================================================
 
-# Vamos gerar o código TikZ de forma automática e limpa para inclusão no arquivo .tex
-tikz_lines = []
-tikz_lines.append(r"\begin{tikzpicture}[>=stealth, node distance=4.5cm, every node/.style={font=\sffamily\scriptsize}]")
+    # Vamos gerar o código TikZ de forma automática e limpa para inclusão no arquivo .tex
+    tikz_lines = []
+    tikz_lines.append(r"\begin{tikzpicture}[>=stealth, node distance=4.5cm, every node/.style={font=\sffamily\scriptsize}]")
 
-# Adiciona estilos para os nós
-tikz_lines.append(r"  \tikzstyle{eta}=[circle, draw=red!80, fill=red!10, thick, minimum size=1.8cm, align=center]")
-tikz_lines.append(r"  \tikzstyle{ra}=[circle, draw=blue!80, fill=blue!10, thick, minimum size=1.8cm, align=center]")
-tikz_lines.append(r"  \tikzstyle{active_edge}=[draw=green!70!black, ->, ultra thick]")
-tikz_lines.append(r"  \tikzstyle{inactive_edge}=[draw=gray!40, ->, dashed, thin]")
+    # Adiciona estilos para os nós
+    tikz_lines.append(r"  \tikzstyle{eta}=[circle, draw=red!80, fill=red!10, thick, minimum size=1.8cm, align=center]")
+    tikz_lines.append(r"  \tikzstyle{ra}=[circle, draw=blue!80, fill=blue!10, thick, minimum size=1.8cm, align=center]")
+    tikz_lines.append(r"  \tikzstyle{active_edge}=[draw=green!70!black, ->, ultra thick]")
+    tikz_lines.append(r"  \tikzstyle{inactive_edge}=[draw=gray!40, ->, dashed, thin]")
 
-# Posiciona os nós em círculo
-# O raio do círculo no TikZ será de 7.0 cm para que a visualização fique bem espaçada e legível
-radius = 7.0
-nodes_list = list(G_plot.nodes())
-num_nodes = len(nodes_list)
+    # Posiciona os nós em círculo
+    # O raio do círculo no TikZ será de 7.0 cm para que a visualização fique bem espaçada e legível
+    radius = 7.0
+    nodes_list = list(G_plot.nodes())
+    num_nodes = len(nodes_list)
 
-tikz_lines.append("")
-tikz_lines.append("  % Posicionamento dos nós")
-for idx, node in enumerate(nodes_list):
-    angle = 360.0 * idx / num_nodes
-    # Gera uma tag curta e única para o nó (ex: eta_brasilia, ra_ceilandia)
-    tag = node.lower().replace(" ", "_").replace("á", "a").replace("í", "i").replace("ã", "a").replace("ô", "o")
-    # Formata o nome de exibição com quebra de linha
-    label_name = node.replace("ETA ", "ETA\\\\\\\\ ").replace("Plano Piloto", "Plano\\\\\\\\ Piloto").replace("Rio Descoberto", "Rio\\\\\\\\ Descoberto")
-    bal = no_balancos[node]
-    sinal = "+" if bal > 0 else ""
-    # Define a classe do estilo
-    style_class = "eta" if "ETA" in node else "ra"
-    tikz_lines.append(f"  \\node[{style_class}] ({tag}) at ({angle}:{radius:.2f}) {{{label_name}\\\\ \\textbf{{{sinal}{bal:.2f} l/s}}}};")
+    tikz_lines.append("")
+    tikz_lines.append("  % Posicionamento dos nós")
+    for idx, node in enumerate(nodes_list):
+        angle = 360.0 * idx / num_nodes
+        # Gera uma tag curta e única para o nó (ex: eta_brasilia, ra_ceilandia)
+        tag = node.lower().replace(" ", "_").replace("á", "a").replace("í", "i").replace("ã", "a").replace("ô", "o")
+        # Formata o nome de exibição com quebra de linha
+        label_name = node.replace("ETA ", "ETA\\\\\\\\ ").replace("Plano Piloto", "Plano\\\\\\\\ Piloto").replace("Rio Descoberto", "Rio\\\\\\\\ Descoberto")
+        bal = no_balancos[node]
+        sinal = "+" if bal > 0 else ""
+        # Define a classe do estilo
+        style_class = "eta" if "ETA" in node else "ra"
+        tikz_lines.append(f"  \\node[{style_class}] ({tag}) at ({angle}:{radius:.2f}) {{{label_name}\\\\ \\textbf{{{sinal}{bal:.2f} l/s}}}};")
 
-tikz_lines.append("")
-tikz_lines.append("  % Conexões (Arestas)")
-for u, v, data in G_plot.edges(data=True):
-    tag_u = u.lower().replace(" ", "_").replace("á", "a").replace("í", "i").replace("ã", "a").replace("ô", "o")
-    tag_v = v.lower().replace(" ", "_").replace("á", "a").replace("í", "i").replace("ã", "a").replace("ô", "o")
-    
-    flow_val = data["flow"]
-    cap_val = data["capacity"]
-    cost_val = data["cost"]
-    
-    is_active = flow_val > 1e-2
-    style = "active_edge" if is_active else "inactive_edge"
-    
-    # Formatação do rótulo da aresta
-    if is_active:
-        edge_label = f"f: {flow_val:.1f}/{cap_val:.0f}\\\\ d: {cost_val:.1f} km"
-        # Ajusta a posição do texto
-        tikz_lines.append(f"  \\path[{style}] ({tag_u}) edge node[draw=none,fill=white,inner sep=1pt,sloped,align=center,font=\\tiny\\color{{green!50!black}}] {{{edge_label}}} ({tag_v});")
-    else:
-        edge_label = f"0/{cap_val:.0f}\\\\ d: {cost_val:.1f} km"
-        tikz_lines.append(f"  \\path[{style}] ({tag_u}) edge node[draw=none,fill=white,inner sep=1pt,sloped,align=center,font=\\tiny\\color{{gray}}] {{{edge_label}}} ({tag_v});")
+    tikz_lines.append("")
+    tikz_lines.append("  % Conexões (Arestas)")
+    for u, v, data in G_plot.edges(data=True):
+        tag_u = u.lower().replace(" ", "_").replace("á", "a").replace("í", "i").replace("ã", "a").replace("ô", "o")
+        tag_v = v.lower().replace(" ", "_").replace("á", "a").replace("í", "i").replace("ã", "a").replace("ô", "o")
+        
+        flow_val = data["flow"]
+        cap_val = data["capacity"]
+        cost_val = data["cost"]
+        
+        is_active = flow_val > 1e-2
+        style = "active_edge" if is_active else "inactive_edge"
+        
+        # Formatação do rótulo da aresta
+        if is_active:
+            edge_label = f"f: {flow_val:.1f}/{cap_val:.0f}\\\\ d: {cost_val:.1f} km"
+            # Ajusta a posição do texto
+            tikz_lines.append(f"  \\path[{style}] ({tag_u}) edge node[draw=none,fill=white,inner sep=1pt,sloped,align=center,font=\\tiny\\color{{green!50!black}}] {{{edge_label}}} ({tag_v});")
+        else:
+            edge_label = f"0/{cap_val:.0f}\\\\ d: {cost_val:.1f} km"
+            tikz_lines.append(f"  \\path[{style}] ({tag_u}) edge node[draw=none,fill=white,inner sep=1pt,sloped,align=center,font=\\tiny\\color{{gray}}] {{{edge_label}}} ({tag_v});")
 
-tikz_lines.append(r"\end{tikzpicture}")
+    tikz_lines.append(r"\end{tikzpicture}")
 
-output_tikz = os.path.join(os.path.dirname(os.path.abspath(__file__)), "grafo_ssp_fluxos_tikz.txt")
-with open(output_tikz, "w", encoding="utf-8") as f:
-    f.write("\n".join(tikz_lines))
-    
-print(f"[Sucesso] Código TikZ exportado com sucesso para: {output_tikz}\n")
-print("=" * 80)
+    output_tikz = os.path.join(os.path.dirname(os.path.abspath(__file__)), "grafo_ssp_fluxos_tikz.txt")
+    with open(output_tikz, "w", encoding="utf-8") as f:
+        f.write("\n".join(tikz_lines))
+        
+    print(f"[Sucesso] Código TikZ exportado com sucesso para: {output_tikz}\n")
+    print("=" * 80)
+else:
+    print("\n" + "="*80)
+    print("                     VISUALIZAÇÃO GRÁFICA PULADA")
+    print("="*80)
+    print("  [Aviso] Bibliotecas 'networkx' e 'matplotlib' não foram encontradas.")
+    print("  O algoritmo SSP foi executado com sucesso e os resultados numéricos estão acima.")
+    print("  Para gerar o gráfico PNG e o código TikZ, instale as dependências:")
+    print("      pip install networkx matplotlib")
+    print("=" * 80)

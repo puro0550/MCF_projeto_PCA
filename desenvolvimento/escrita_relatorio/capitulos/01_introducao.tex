@@ -1,0 +1,20 @@
+%===== Section 1 =====%
+\newpage
+\pagestyle{fancy}
+\pagenumbering{arabic}
+\setcounter{page}{3} % Define a página inicial.
+\section{INTRODUÇÃO}
+
+Para a realização deste trabalho, realizou-se uma análise do transporte ótimo e uma revisão bibliográfica de algoritmos correlatos ao tema. Diante da impossibilidade de abordar esse assunto em sua formulação geral devido à sua grande amplitude, optou-se por focar em uma versão discreta, resgatando a abordagem clássica de seus primórdios.
+
+O problema de transporte ótimo foi introduzido por Gaspard Monge em 1781, motivado pela minimização do custo no deslocamento de terra. Cerca de 150 anos depois, Leonid Kantorovich revisitou essa formulação sob a ótica da programação linear, expandindo as aplicações da teoria, conforme apresentado por \textcite{figalli2021invitation}.
+
+Um caso particular dessa linha de estudo é a minimização do custo no envio de fluxos em redes, conhecido como problema de Fluxo de Custo Mínimo (\textit{Minimum Cost Flow} --- MCF). Este trabalho se propôs a estudar e aplicar uma solução para uma instância artificial desse modelo.
+
+Como fonte de inspiração para a condução desta pesquisa, realizou-se uma revisão de implementações de algoritmos voltados à resolução do MCF. O artigo norteador do estudo é o desenvolvido por \textcite{mascherpa2023estimating}, no qual os autores empregam transporte ótimo regularizado para modelar redes de abastecimento hídrico.
+
+Sob a perspectiva dos estudos de \textcite{mascherpa2023estimating}, a instância artificial proposta neste relatório foi modelada a partir de dados extraídos do Atlas do Distrito Federal \parencite{atlasdf2020} e de informações disponíveis no catálogo de metadados geográficos do IPEDF \parencite{ipedfgeoserver}.
+
+Para solucionar o MCF na instância em questão, implementou-se em Python o algoritmo \textbf{Successive Shortest Paths} (SSP), baseado no pseudocódigo de \textcite{ahuja1993network}.
+
+Por fim, registra-se que este trabalho foi realizado de forma estritamente individual por Arthur Augusto Campos, responsável único por todas as etapas de levantamento teórico, modelagem, desenvolvimento do código-fonte em Python, execução experimental e redação deste relatório.

@@ -1,0 +1,58 @@
+%====== CONFIGURAÇÕES BIBLIOGRÁFICAS ======%
+\DefineBibliographyStrings{brazilian}{andothers = {et al.}}
+%\renewcommand*{\mkbibnamefamily}[1]{\textsc{#1}}
+\renewcommand*{\mkbibnamegiven}[1]{#1}
+
+
+
+\defbibenvironment{bibliography}
+  {\list
+     {\printfield[labelnumberwidth]{labelnumber}}
+     {\setlength{\labelwidth}{\labelnumberwidth}%
+      \setlength{\leftmargin}{\labelwidth}%
+      \setlength{\itemsep}{\baselineskip}%
+      \setlength{\parsep}{0pt}%
+      \renewcommand*{\makelabel}[1]{##1\hss}}}
+  {\endlist}
+  {\item}
+
+%====== AMBIENTE QUOTE ======%
+% Citação direta (p/ quote): AUTOR, ano, p. n
+\NewDocumentCommand{\abntcite}{O{} O{} m}{%
+  \textup{%
+    \textsc{(}%
+    \textsc{\citeauthor*{#3}}, \citeyear*{#3}%
+    \if\relax\detokenize{#1}\relax
+      % se #1 (página) vazio, não imprime nada
+    \else
+      , p.\,#1%
+    \fi
+    \if\relax\detokenize{#2}\relax
+      % se #2 (texto extra) vazio, não imprime nada
+    \else
+      , #2%
+    \fi
+    \textsc{)}%
+  }%
+}
+
+
+\renewenvironment{quote}
+  {\list{}{\leftmargin=4cm \rightmargin=0cm}
+   \item\relax\small\singlespacing}
+  {\endlist}
+
+%====== AMBIENTES DE TEOREMAS ======%
+\newtheorem{theorem}{Teorema}[section]
+\newtheorem{corollary}{Corolário}[theorem]
+\newtheorem{lemma}[theorem]{Lema}
+\newtheorem{proposition}{Proposição}[section]
+\newtheorem{exemple}{Exemplo}
+\newtheorem{definition}{Definição}[section]
+
+%====== PÁGINAS E NÚMEROS ======%
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[R]{\fontsize{10pt}{12pt}\selectfont\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrulewidth}{0pt}
